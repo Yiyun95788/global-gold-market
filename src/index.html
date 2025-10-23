@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Gold Market Analysis</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header>
+        <h1>Global Gold Market Analysis</h1>
+    </header>
+    
+    <nav>
+        <button class="tab-btn active" onclick="showTab(1)">Visualization 1</button>
+        <button class="tab-btn" onclick="showTab(2)">Visualization 2</button>
+        <button class="tab-btn" onclick="showTab(3)">Visualization 3</button>
+        <button class="tab-btn" onclick="showTab(4)">Visualization 4</button>
+        <button class="tab-btn" onclick="showTab(5)">Visualization 5</button>
+    </nav>
+    
+    <div id="viz1" class="tab-content active">
+        <h2>Visualization 1</h2>
+        <div class="viz-container"></div>
+    </div>
+    
+    <div id="viz2" class="tab-content">
+        <h2>Visualization 2</h2>
+        <div class="viz-container"></div>
+    </div>
+    
+    <div id="viz3" class="tab-content">
+        <h2>Visualization 3</h2>
+        <div class="viz-container"></div>
+    </div>
+    
+    <div id="viz4" class="tab-content">
+        <h2>Visualization 4</h2>
+        <div class="viz-container"></div>
+    </div>
+    
+    <div id="viz5" class="tab-content">
+        <h2>Visualization 5</h2>
+        <div class="viz-container"></div>
+    </div>
+    
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="js/script.js"></script>
+</body>
+</html>
