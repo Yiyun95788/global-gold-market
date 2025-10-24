@@ -447,7 +447,242 @@ function createViz3() {
 // Viz 4
 function createViz4() {
     let container = document.querySelector('#viz4 .viz-container');
-    container.innerHTML = 'Visualization 4';
+    const assets = ['Gold', 'BTC', 'USD', 'Silver', 'S&P 500'];
+    
+    Promise.all([
+        d3.csv('../w6_datasets/SP500 oil gold bitcoin.csv'),
+        d3.csv('data/Silver Futures Historical Data.csv'),
+        d3.csv('data/US Dollar Index Futures Historical Data.csv')
+    ]).then(function([mainData, silverData, usdData]) {
+        const combined = {};
+        
+        mainData.forEach(d => {
+            combined[d.Date] = {gold: +d.Gold, btc: +d.BITCOIN, sp500: +d['S&P500']};
+        });
+        
+        silverData.forEach(d => {
+            const p = d.Date.split('/');
+            const key = `${p[2]}-${p[0].padStart(2, '0')}-${p[1].padStart(2, '0')}`;
+            if (combined[key]) combined[key].silver = +d.Price.replace(/,/g, '');
+        });
+        
+        usdData.forEach(d => {
+            const p = d.Date.split('/');
+            const key = `${p[2]}-${p[0].padStart(2, '0')}-${p[1].padStart(2, '0')}`;
+            if (combined[key]) combined[key].usd = +d.Price.replace(/,/g, '');
+        });
+        
+        const correlationData = {};
+        for (let year = 2010; year <= 2024; year++) {
+            const yearData = Object.keys(combined)
+                .filter(d => d.startsWith(year.toString()))
+                .map(d => combined[d])
+                .filter(d => d.gold && d.btc && d.usd && d.silver && d.sp500);
+            
+            if (yearData.length < 20) continue;
+            
+            const allAssets = [
+                yearData.map(d => d.gold),
+                yearData.map(d => d.btc),
+                yearData.map(d => d.usd),
+                yearData.map(d => d.silver),
+                yearData.map(d => d.sp500)
+            ];
+            
+            correlationData[year] = [];
+            for (let i = 0; i < 5; i++) {
+                correlationData[year][i] = [];
+                for (let j = 0; j < 5; j++) {
+                    const x = allAssets[i], y = allAssets[j], n = x.length;
+                    const sumX = x.reduce((a, b) => a + b, 0);
+                    const sumY = y.reduce((a, b) => a + b, 0);
+                    const sumXY = x.reduce((s, xi, k) => s + xi * y[k], 0);
+                    const sumX2 = x.reduce((s, xi) => s + xi * xi, 0);
+                    const sumY2 = y.reduce((s, yi) => s + yi * yi, 0);
+                    const num = n * sumXY - sumX * sumY;
+                    const den = Math.sqrt((n * sumX2 - sumX * sumX) * (n * sumY2 - sumY * sumY));
+                    correlationData[year][i][j] = den === 0 ? 0 : num / den;
+                }
+            }
+        }
+        
+        const years = Object.keys(correlationData).map(y => parseInt(y)).sort();
+        
+        container.innerHTML = '';
+        
+        const vizWrapper = d3.select(container)
+            .append('div')
+            .style('display', 'flex')
+            .style('flex-direction', 'column')
+            .style('align-items', 'center')
+            .style('justify-content', 'center')
+            .style('height', '100%')
+            .style('gap', '0');
+        
+        const svgContainer = vizWrapper.append('div');
+        
+        const margin = {top: 80, right: 100, bottom: 10, left: 110};
+        const cellSize = 90;
+        const width = cellSize * 5 + margin.left + margin.right;
+        const height = cellSize * 5 + margin.top + margin.bottom;
+        
+        const svg = svgContainer
+            .append('svg')
+            .attr('width', width)
+            .attr('height', height);
+        
+        const tooltip = d3.select('body')
+            .append('div')
+            .attr('class', 'tooltip')
+            .style('opacity', 0);
+        
+        const colorScale = d3.scaleLinear()
+            .domain([-1, 0, 1])
+            .range(['#ef4444', '#ffffff', '#3b82f6']);
+        
+        function draw(year) {
+            const data = correlationData[year];
+            if (!data) return;
+            
+            svg.selectAll('g').remove();
+            const g = svg.append('g')
+                .attr('transform', `translate(${margin.left}, ${margin.top})`);
+            
+            svg.append('text')
+                .attr('x', width / 2)
+                .attr('y', 35)
+                .attr('text-anchor', 'middle')
+                .style('font-size', '20px')
+                .style('font-weight', '700')
+                .style('fill', '#1f2937')
+                .text('How strongly is gold price correlated with other financial assets?');
+            
+            for (let i = 0; i < 5; i++) {
+                for (let j = 0; j < 5; j++) {
+                    const value = data[i][j];
+                    g.append('rect')
+                        .attr('class', 'heatmap-cell')
+                        .attr('x', j * cellSize)
+                        .attr('y', i * cellSize)
+                        .attr('width', cellSize)
+                        .attr('height', cellSize)
+                        .attr('fill', colorScale(value))
+                        .on('mouseover', function(event) {
+                            d3.select(this).style('opacity', 0.8);
+                            tooltip.transition().duration(200).style('opacity', 1);
+                            tooltip.html(`<strong>${assets[i]} vs ${assets[j]}</strong><br/>Correlation: ${value.toFixed(2)}<br/>Year: ${year}`)
+                                .style('left', (event.pageX + 10) + 'px')
+                                .style('top', (event.pageY - 10) + 'px');
+                        })
+                        .on('mouseout', function() {
+                            d3.select(this).style('opacity', 1);
+                            tooltip.transition().duration(200).style('opacity', 0);
+                        });
+                    
+                    g.append('text')
+                        .attr('class', 'heatmap-value')
+                        .attr('x', j * cellSize + cellSize / 2)
+                        .attr('y', i * cellSize + cellSize / 2 + 5)
+                        .attr('text-anchor', 'middle')
+                        .style('font-weight', 'bold')
+                        .text(value.toFixed(2));
+                }
+            }
+            
+            assets.forEach((asset, i) => {
+                g.append('text')
+                    .attr('class', 'heatmap-label')
+                    .attr('x', -10)
+                    .attr('y', i * cellSize + cellSize / 2 + 5)
+                    .attr('text-anchor', 'end')
+                    .text(asset);
+                g.append('text')
+                    .attr('class', 'heatmap-label')
+                    .attr('x', i * cellSize + cellSize / 2)
+                    .attr('y', -10)
+                    .attr('text-anchor', 'middle')
+                    .text(asset);
+            });
+            
+            const legendHeight = 250, legendWidth = 20;
+            const legendX = width - margin.right + 30;
+            const legendY = margin.top + (cellSize * 5 - legendHeight) / 2;
+            
+            const gradient = svg.append('defs')
+                .append('linearGradient')
+                .attr('id', 'legend-gradient')
+                .attr('x1', '0%')
+                .attr('y1', '100%')
+                .attr('x2', '0%')
+                .attr('y2', '0%');
+            gradient.append('stop')
+                .attr('offset', '0%')
+                .attr('stop-color', '#ef4444');
+            gradient.append('stop')
+                .attr('offset', '50%')
+                .attr('stop-color', '#ffffff');
+            gradient.append('stop')
+                .attr('offset', '100%')
+                .attr('stop-color', '#3b82f6');
+            
+            svg.append('rect')
+                .attr('x', legendX)
+                .attr('y', legendY)
+                .attr('width', legendWidth)
+                .attr('height', legendHeight)
+                .attr('rx', 4)
+                .style('fill', 'url(#legend-gradient)')
+                .style('stroke', '#e5e7eb')
+                .style('stroke-width', 1);
+            
+            svg.append('g')
+                .attr('transform', `translate(${legendX + legendWidth}, ${legendY})`)
+                .call(d3.axisRight(d3.scaleLinear().domain([1, -1]).range([0, legendHeight])).ticks(5).tickFormat(d => d.toFixed(1)));
+            
+            svg.append('text')
+                .attr('x', legendX + legendWidth / 2)
+                .attr('y', legendY - 10)
+                .attr('text-anchor', 'middle')
+                .style('font-size', '12px')
+                .style('font-weight', '600')
+                .text('Positive');
+            
+            svg.append('text')
+                .attr('x', legendX + legendWidth / 2)
+                .attr('y', legendY + legendHeight + 20)
+                .attr('text-anchor', 'middle')
+                .style('font-size', '12px')
+                .style('font-weight', '600')
+                .text('Negative');
+        }
+        
+        const controls = vizWrapper.append('div')
+            .attr('class', 'controls');
+        
+        controls.append('label')
+            .attr('for', 'yearSlider')
+            .text('Year:');
+        
+        const sliderInput = controls.append('input')
+            .attr('type', 'range')
+            .attr('id', 'yearSlider-viz')
+            .attr('min', years[0])
+            .attr('max', years[years.length - 1])
+            .attr('value', years[0])
+            .attr('step', 1);
+        
+        const yearDisplay = controls.append('span')
+            .attr('id', 'yearValue-viz')
+            .text(years[0]);
+        
+        draw(years[0]);
+        
+        sliderInput.on('input', function() {
+            const year = parseInt(this.value);
+            yearDisplay.text(year);
+            draw(year);
+        });
+    });
 }
 
 // Viz 5
