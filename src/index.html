@@ -9,7 +9,21 @@
 <body>
     <header>
         <h1>Global Gold Market Analysis</h1>
+        <button id="storyBtn" class="story-btn">Story</button>
     </header>
+    
+    <div id="storyOverlay" class="story-overlay">
+        <div class="story-content">
+            <button class="close-btn" onclick="closeStory()">&times;</button>
+            <h2 id="storyTitle"></h2>
+            <p id="storyText"></p>
+            <div class="story-nav">
+                <button onclick="prevParagraph()">&lt;</button>
+                <span id="pageIndicator"></span>
+                <button onclick="nextParagraph()">&gt;</button>
+            </div>
+        </div>
+    </div>
     
     <nav>
         <button class="tab-btn active" onclick="showTab(1)">Visualization 1</button>
