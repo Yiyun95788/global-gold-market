@@ -119,7 +119,7 @@ function calculateVolatility(prices, window) {
     return volatilities;
 }
 
-// Viz 1 - 3D Volatility Landscape
+// Viz 1
 function createViz1() {
     let container = document.querySelector('#viz1 .viz-container');
     container.innerHTML = '';
@@ -149,7 +149,7 @@ function createViz1() {
     vizDiv.style.position = 'relative';
     container.appendChild(vizDiv);
     
-    // Add legend
+    // Legend
     let legend = document.createElement('div');
     legend.style.cssText = 'position: absolute; bottom: 20px; right: 20px; background: white; padding: 15px; border: 1px solid #ccc; z-index: 10;';
     legend.innerHTML = `
@@ -177,7 +177,7 @@ function createViz1() {
     let prices = data.map(d => parseFloat(d.Close));
     let volatilities = calculateVolatility(prices, 30);
     
-    // Filter and normalize data
+    // Filter data
     let validData = [];
     for (let i = 0; i < data.length; i++) {
         if (volatilities[i] > 0) {
@@ -190,13 +190,11 @@ function createViz1() {
         }
     }
     
-    // Find min/max for scaling
     let minPrice = Math.min(...validData.map(d => d.price));
     let maxPrice = Math.max(...validData.map(d => d.price));
     let minVol = Math.min(...validData.map(d => d.volatility));
     let maxVol = Math.max(...validData.map(d => d.volatility));
     
-    // Three.js setup
     let scene = new THREE.Scene();
     scene.background = new THREE.Color(0xffffff);
     
@@ -217,7 +215,6 @@ function createViz1() {
     let light2 = new THREE.AmbientLight(0x888888);
     scene.add(light2);
     
-    // Create grid of points
     let gridData = [];
     for (let i = 0; i < validData.length; i += 10) {
         gridData.push(validData[i]);
@@ -238,14 +235,12 @@ function createViz1() {
             let x = (t / timeSteps) * 200 - 100;
             let y = (v / volSteps) * 100 - 50;
             
-            // Z is price scaled by volatility
             let normalizedPrice = (point.price - minPrice) / (maxPrice - minPrice);
             let volFactor = point.volatility / maxVol;
             let z = normalizedPrice * 100 * (0.5 + volFactor);
             
             vertices.push(x, y, z);
             
-            // Color by price (green to red)
             let r = normalizedPrice;
             let g = 1 - normalizedPrice;
             let b = 0.2;
@@ -272,21 +267,21 @@ function createViz1() {
     // Add axis lines
     let axisMaterial = new THREE.LineBasicMaterial({ color: 0x000000 });
     
-    // X axis (Time)
+    // X axis (time)
     let xGeo = new THREE.BufferGeometry().setFromPoints([
         new THREE.Vector3(-100, -60, 0),
         new THREE.Vector3(100, -60, 0)
     ]);
     scene.add(new THREE.Line(xGeo, axisMaterial));
     
-    // Y axis (Volatility)
+    // Y axis (volatility)
     let yGeo = new THREE.BufferGeometry().setFromPoints([
         new THREE.Vector3(-100, -60, 0),
         new THREE.Vector3(-100, 50, 0)
     ]);
     scene.add(new THREE.Line(yGeo, axisMaterial));
     
-    // Z axis (Price)
+    // Z axis (price)
     let zGeo = new THREE.BufferGeometry().setFromPoints([
         new THREE.Vector3(-100, -60, 0),
         new THREE.Vector3(-100, -60, 120)
