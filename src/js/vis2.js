@@ -43,8 +43,8 @@ function createViz2() {
     quickCompare.style.cssText = 'margin-bottom: 15px; padding-bottom: 15px; border-bottom: 2px solid #ddd;';
     quickCompare.innerHTML = `
         <div style="font-weight: bold; margin-bottom: 10px;">Quick Compare</div>
-        <button id="viz2-compare-nato-brics" style="width: 100%; padding: 10px; cursor: pointer; border: none; border-radius: 4px; background: linear-gradient(90deg, #4A90E2 0%, #4A90E2 50%, #E8B923 50%, #E8B923 100%); color: white; font-weight: bold; margin-bottom: 8px;">NATO vs BRICS</button>
-        <button id="viz2-compare-nato-brics-top3" style="width: 100%; padding: 10px; cursor: pointer; border: none; border-radius: 4px; background: linear-gradient(90deg, #4A90E2 0%, #4A90E2 50%, #E8B923 50%, #E8B923 100%); color: white; font-weight: bold; margin-bottom: 8px;">NATO vs BRICS (Top 3)</button>
+        <button id="viz2-compare-g7-brics" style="width: 100%; padding: 10px; cursor: pointer; border: none; border-radius: 4px; background: linear-gradient(90deg, #4A90E2 0%, #4A90E2 50%, #E8B923 50%, #E8B923 100%); color: white; font-weight: bold; margin-bottom: 8px;">G7 vs BRICS</button>
+        <button id="viz2-compare-g7-brics-top3" style="width: 100%; padding: 10px; cursor: pointer; border: none; border-radius: 4px; background: linear-gradient(90deg, #4A90E2 0%, #4A90E2 50%, #E8B923 50%, #E8B923 100%); color: white; font-weight: bold; margin-bottom: 8px;">G7 vs BRICS (Top 3)</button>
         <button id="viz2-compare-top10-rest" style="width: 100%; padding: 10px; cursor: pointer; border: none; border-radius: 4px; background: linear-gradient(90deg, #7b1fa2 0%, #7b1fa2 50%, #9e9e9e 50%, #9e9e9e 100%); color: white; font-weight: bold;">Top 10 vs Rest of World</button>
         <button id="viz2-compare-top3-rest" style="width: 100%; padding: 10px; cursor: pointer; border: none; border-radius: 4px; background: linear-gradient(90deg, #512da8 0%, #512da8 50%, #9e9e9e 50%, #9e9e9e 100%); color: white; font-weight: bold; margin-top: 8px;">Top 3 vs Rest of World</button>
     `;
@@ -56,7 +56,7 @@ function createViz2() {
     allianceFilter.innerHTML = `
         <div style="font-weight: bold; margin-bottom: 10px;">Filter by Alliance</div>
         <button id="viz2-filter-all" class="alliance-filter-btn active" style="width: 100%; padding: 6px; margin: 3px 0; cursor: pointer; border: none; border-radius: 3px;">All Countries</button>
-        <button id="viz2-filter-nato" class="alliance-filter-btn" style="width: 100%; padding: 6px; margin: 3px 0; cursor: pointer; border: none; border-radius: 3px; background: #4A90E2; color: white;">NATO Only</button>
+        <button id="viz2-filter-g7" class="alliance-filter-btn" style="width: 100%; padding: 6px; margin: 3px 0; cursor: pointer; border: none; border-radius: 3px; background: #4A90E2; color: white;">G7 Only</button>
         <button id="viz2-filter-brics" class="alliance-filter-btn" style="width: 100%; padding: 6px; margin: 3px 0; cursor: pointer; border: none; border-radius: 3px; background: #E8B923; color: white;">BRICS Only</button>
         <input id="viz2-search" type="text" placeholder="Search countries..." style="margin-top: 10px; width: 100%; box-sizing: border-box; padding: 8px 10px; border: 1px solid #ccc; border-radius: 4px;" />
     `;
@@ -76,7 +76,7 @@ function createViz2() {
     
     // Weight displays
     let weightsDiv = document.createElement('div');
-    weightsDiv.style.cssText = 'position: absolute; top: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 100px; z-index: 100; pointer-events: none;';
+    weightsDiv.style.cssText = 'position: absolute; top: 20px; left: 50%; transform: translateX(20%); display: flex; gap: 100px; z-index: 100; pointer-events: none;';
     weightsDiv.innerHTML = `
         <div style="text-align: center; background: rgba(74, 144, 226, 0.9); padding: 15px 25px; border-radius: 8px; color: white; font-weight: bold; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
             <div style="font-size: 14px; margin-bottom: 5px;">Left Side</div>
@@ -89,6 +89,16 @@ function createViz2() {
     `;
     canvasContainer.appendChild(weightsDiv);
     
+    // Explanation text box
+    let explanationDiv = document.createElement('div');
+    explanationDiv.id = 'viz2-explanation';
+    explanationDiv.style.cssText = 'position: absolute; top: 120px; left: calc(50% + 20% - 50px); width: 300px; background: rgba(255, 255, 255, 0.95); padding: 15px 20px; border-radius: 8px; border: 2px solid #ddd; z-index: 100; pointer-events: none; text-align: left; box-shadow: 0 2px 8px rgba(0,0,0,0.1);';
+    explanationDiv.innerHTML = `
+        <div style="font-weight: bold; font-size: 16px; margin-bottom: 8px; color: #333;">Scale Information</div>
+        <div id="viz2-explanation-text" style="font-size: 14px; color: #666; line-height: 1.4;">Click a comparison button to see detailed information about the gold reserve analysis.</div>
+    `;
+    canvasContainer.appendChild(explanationDiv);
+    
     // Legend
     let legend = document.createElement('div');
     legend.style.cssText = 'position: absolute; bottom: 20px; right: 20px; background: white; padding: 15px; border: 2px solid #ddd; border-radius: 4px; z-index: 100; pointer-events: none;';
@@ -96,7 +106,7 @@ function createViz2() {
         <div style="font-weight: bold; margin-bottom: 8px;">Alliances</div>
         <div style="display: flex; align-items: center; margin: 4px 0;">
             <div style="width: 20px; height: 20px; background: #4A90E2; margin-right: 8px; border-radius: 2px;"></div>
-            <span>NATO</span>
+            <span>G7</span>
         </div>
         <div style="display: flex; align-items: center; margin: 4px 0;">
             <div style="width: 20px; height: 20px; background: #E8B923; margin-right: 8px; border-radius: 2px;"></div>
@@ -121,13 +131,9 @@ function createViz2() {
 function initViz2(csvData, canvasContainer) {
     console.log('Initializing Viz2 with', csvData.length, 'data rows');
     
-    // NATO countries
-    const natoCountries = [
-        "Albania", "Belgium", "Bulgaria", "Canada", "Croatia", "Czechia",
-        "Denmark", "Estonia", "Finland", "France", "Germany", "Greece", "Hungary",
-        "Iceland", "Italy", "Latvia", "Lithuania", "Luxembourg", "Montenegro",
-        "Netherlands", "North Macedonia", "Norway", "Poland", "Portugal", "Romania",
-        "Slovakia", "Slovenia", "Spain", "Sweden", "Turkey", "United Kingdom", "United States"
+    // G7 countries
+    const g7Countries = [
+        "Canada", "France", "Germany", "Italy", "Japan", "United Kingdom", "United States of America"
     ];
     
     // BRICS countries
@@ -142,6 +148,15 @@ function initViz2(csvData, canvasContainer) {
     let currentPeriodIndex = 0;
     let currentFilter = 'all';
     let countryNameMap = {}; // Will be loaded from JSON
+    
+    // Explanation dictionary for different comparison buttons
+    const explanationTexts = {
+        'g7-brics': 'G7 vs BRICS: This comparison shows the total gold reserves of G7 countries (blue) versus BRICS countries (gold). G7 includes 7 major advanced economies, while BRICS represents 10 major emerging economies. This analysis reveals the strategic gold holdings between established economic powers and emerging economic powers.',
+        'g7-brics-top3': 'G7 vs BRICS (Top 3): This focused comparison displays only the top 3 gold-holding countries from each group. This provides a clearer view of the most significant players in each group, highlighting the concentration of gold reserves among the largest economies in each alliance.',
+        'top10-rest': 'Top 10 vs Rest of World: This analysis compares the gold reserves of the world\'s top 10 gold-holding countries against the combined reserves of all other nations. This reveals the global distribution of gold wealth and shows how concentrated gold reserves are among a small number of countries.',
+        'top3-rest': 'Top 3 vs Rest of World: This comparison pits the world\'s top 3 gold-holding countries against the combined reserves of all other nations. This extreme comparison highlights the massive concentration of gold wealth among just three countries versus the entire rest of the world.',
+        'default': 'Click a comparison button to see detailed information about the gold reserve analysis. Each comparison reveals different aspects of global gold distribution and strategic reserves.'
+    };
     
     // Matter.js variables
     let engine, render, world, runner;
@@ -201,22 +216,34 @@ function initViz2(csvData, canvasContainer) {
         });
         
         document.getElementById('viz2-reset-btn').addEventListener('click', resetScale);
-        document.getElementById('viz2-compare-nato-brics').addEventListener('click', compareNATOvsBRICS);
+        document.getElementById('viz2-compare-g7-brics').addEventListener('click', () => {
+            updateExplanation('g7-brics');
+            compareG7vsBRICS();
+        });
         document.getElementById('viz2-filter-all').addEventListener('click', () => setFilter('all'));
-        document.getElementById('viz2-filter-nato').addEventListener('click', () => setFilter('nato'));
+        document.getElementById('viz2-filter-g7').addEventListener('click', () => setFilter('g7'));
         document.getElementById('viz2-filter-brics').addEventListener('click', () => setFilter('brics'));
         
-        const btnTop3 = document.getElementById('viz2-compare-nato-brics-top3');
+        const btnTop3 = document.getElementById('viz2-compare-g7-brics-top3');
         if (btnTop3) {
-            btnTop3.addEventListener('click', compareNATOvsBRICSTop3);
+            btnTop3.addEventListener('click', () => {
+                updateExplanation('g7-brics-top3');
+                compareG7vsBRICSTop3();
+            });
         }
         const btnTop10Rest = document.getElementById('viz2-compare-top10-rest');
         if (btnTop10Rest) {
-            btnTop10Rest.addEventListener('click', compareTop10VsRest);
+            btnTop10Rest.addEventListener('click', () => {
+                updateExplanation('top10-rest');
+                compareTop10VsRest();
+            });
         }
         const btnTop3Rest = document.getElementById('viz2-compare-top3-rest');
         if (btnTop3Rest) {
-            btnTop3Rest.addEventListener('click', compareTop3VsRest);
+            btnTop3Rest.addEventListener('click', () => {
+                updateExplanation('top3-rest');
+                compareTop3VsRest();
+            });
         }
         
         // Search filter
@@ -240,7 +267,7 @@ function initViz2(csvData, canvasContainer) {
         });
         
         const activeBtn = filter === 'all' ? 'viz2-filter-all' : 
-                         filter === 'nato' ? 'viz2-filter-nato' : 'viz2-filter-brics';
+                         filter === 'g7' ? 'viz2-filter-g7' : 'viz2-filter-brics';
         document.getElementById(activeBtn).classList.add('active');
         document.getElementById(activeBtn).style.opacity = '1';
         
@@ -252,8 +279,16 @@ function initViz2(csvData, canvasContainer) {
         document.getElementById('viz2-time-display').textContent = period;
     }
     
+    function updateExplanation(explanationKey) {
+        const explanationText = explanationTexts[explanationKey] || explanationTexts['default'];
+        const explanationElement = document.getElementById('viz2-explanation-text');
+        if (explanationElement) {
+            explanationElement.textContent = explanationText;
+        }
+    }
+    
     function getAlliance(country) {
-        if (natoCountries.includes(country)) return 'NATO';
+        if (g7Countries.includes(country)) return 'G7';
         
         const bricsVariations = {
             "Brazil": ["Brazil"],
@@ -278,7 +313,7 @@ function initViz2(csvData, canvasContainer) {
     }
     
     function getAllianceColor(alliance) {
-        if (alliance === 'NATO') return '#4A90E2';
+        if (alliance === 'G7') return '#4A90E2';
         if (alliance === 'BRICS') return '#E8B923';
         return '#888888';
     }
@@ -301,7 +336,7 @@ function initViz2(csvData, canvasContainer) {
             }))
             .filter(item => {
                 if (currentFilter === 'all') return true;
-                if (currentFilter === 'nato') return item.alliance === 'NATO';
+                if (currentFilter === 'g7') return item.alliance === 'G7';
                 if (currentFilter === 'brics') return item.alliance === 'BRICS';
                 return true;
             })
@@ -641,19 +676,16 @@ function initViz2(csvData, canvasContainer) {
         onMouseMove(e);
     }
     
-    // NATO vs BRICS comparison
-    function compareNATOvsBRICS() {
-        console.log('NATO vs BRICS button clicked');
+    // G7 vs BRICS comparison
+    function compareG7vsBRICS() {
+        console.log('G7 vs BRICS button clicked');
         window.resetD3Scale();
         
         const currentPeriod = timePeriods[currentPeriodIndex];
         const currentData = goldDataByPeriod[currentPeriod] || {};
         
-        // NATO countries list (using the mapped names from JSON)
-        const natoCountries = ['Albania', 'Belgium', 'Bulgaria', 'Canada', 'Croatia', 'Czechia', 'Denmark', 
-            'Estonia', 'Finland', 'France', 'Germany', 'Greece', 'Hungary', 'Iceland', 'Italy', 'Latvia', 
-            'Lithuania', 'Luxembourg', 'Montenegro', 'Netherlands', 'Macedonia', 'Norway', 'Poland', 
-            'Portugal', 'Romania', 'Slovakia', 'Slovenia', 'Spain', 'Sweden', 'Turkey', 'United Kingdom', 'United States of America'];
+        // G7 countries list (using the mapped names from JSON)
+        const g7CountriesList = ['Canada', 'France', 'Germany', 'Italy', 'Japan', 'United Kingdom', 'United States of America'];
         
         // BRICS countries (using the mapped names from JSON)
         const bricsCountries = ['Brazil', 'Russia', 'India', 'China', 'South Africa', 'Egypt', 'Ethiopia', 
@@ -662,10 +694,10 @@ function initViz2(csvData, canvasContainer) {
         // Find matching countries in the data
         // countryNameMap: { "CSV Name" => "Normal Name" }
         // So we need to find CSV keys where countryNameMap[csvKey] === normalName
-        const natoData = natoCountries.map(name => {
+        const g7Data = g7CountriesList.map(name => {
             // Find CSV name that maps to this normal name
             const csvName = Object.keys(currentData).find(csvKey => countryNameMap[csvKey] === name);
-            return csvName ? { name, tonnes: currentData[csvName], alliance: 'NATO' } : null;
+            return csvName ? { name, tonnes: currentData[csvName], alliance: 'G7' } : null;
         }).filter(d => d && d.tonnes > 0);
         
         const bricsData = bricsCountries.map(name => {
@@ -674,7 +706,7 @@ function initViz2(csvData, canvasContainer) {
             return csvName ? { name, tonnes: currentData[csvName], alliance: 'BRICS' } : null;
         }).filter(d => d && d.tonnes > 0);
         
-        console.log('NATO countries found:', natoData.length, natoData);
+        console.log('G7 countries found:', g7Data.length, g7Data);
         console.log('BRICS countries found:', bricsData.length, bricsData);
         
         // Drop BRICS on right first
@@ -684,33 +716,30 @@ function initViz2(csvData, canvasContainer) {
             }, index * 100);
         });
         
-        // Then drop NATO on left (after BRICS finishes)
+        // Then drop G7 on left (after BRICS finishes)
         const bricsDelay = bricsData.length * 100;
-        natoData.forEach((country, index) => {
+        g7Data.forEach((country, index) => {
             setTimeout(() => {
                 dropCountryOnScale(country, 100, 100, true);
             }, bricsDelay + (index * 100));
         });
     }
     
-    // NATO vs BRICS (Top 3)
-    function compareNATOvsBRICSTop3() {
-        console.log('NATO vs BRICS (Top 3) button clicked');
+    // G7 vs BRICS (Top 3)
+    function compareG7vsBRICSTop3() {
+        console.log('G7 vs BRICS (Top 3) button clicked');
         window.resetD3Scale();
         
         const currentPeriod = timePeriods[currentPeriodIndex];
         const currentData = goldDataByPeriod[currentPeriod] || {};
         
-        const natoCountries = ['Albania', 'Belgium', 'Bulgaria', 'Canada', 'Croatia', 'Czechia', 'Denmark', 
-            'Estonia', 'Finland', 'France', 'Germany', 'Greece', 'Hungary', 'Iceland', 'Italy', 'Latvia', 
-            'Lithuania', 'Luxembourg', 'Montenegro', 'Netherlands', 'Macedonia', 'Norway', 'Poland', 
-            'Portugal', 'Romania', 'Slovakia', 'Slovenia', 'Spain', 'Sweden', 'Turkey', 'United Kingdom', 'United States of America'];
+        const g7CountriesList = ['Canada', 'France', 'Germany', 'Italy', 'Japan', 'United Kingdom', 'United States of America'];
         const bricsCountries = ['Brazil', 'Russia', 'India', 'China', 'South Africa', 'Egypt', 'Ethiopia', 
             'Iran', 'United Arab Emirates', 'Indonesia'];
         
-        const natoData = natoCountries.map(name => {
+        const g7Data = g7CountriesList.map(name => {
             const csvName = Object.keys(currentData).find(csvKey => countryNameMap[csvKey] === name);
-            return csvName ? { name, tonnes: currentData[csvName], alliance: 'NATO' } : null;
+            return csvName ? { name, tonnes: currentData[csvName], alliance: 'G7' } : null;
         }).filter(Boolean).sort((a,b) => b.tonnes - a.tonnes).slice(0,3);
         
         const bricsData = bricsCountries.map(name => {
@@ -718,14 +747,14 @@ function initViz2(csvData, canvasContainer) {
             return csvName ? { name, tonnes: currentData[csvName], alliance: 'BRICS' } : null;
         }).filter(Boolean).sort((a,b) => b.tonnes - a.tonnes).slice(0,3);
         
-        // Drop BRICS first, then NATO
+        // Drop BRICS first, then G7
         bricsData.forEach((country, index) => {
             setTimeout(() => {
                 dropCountryOnScale(country, 700, 100, false);
             }, index * 120);
         });
         const delay = bricsData.length * 120;
-        natoData.forEach((country, index) => {
+        g7Data.forEach((country, index) => {
             setTimeout(() => {
                 dropCountryOnScale(country, 100, 100, true);
             }, delay + index * 120);
