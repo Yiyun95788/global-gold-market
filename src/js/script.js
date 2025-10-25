@@ -432,11 +432,806 @@ function setView1(view) {
     renderer.render(scene, camera);
 }
 
-// Viz 2
+// Viz 2 is now in vis2.js
+// Placeholder function in case it's called before vis2.js loads
 function createViz2() {
-    let container = document.querySelector('#viz2 .viz-container');
-    container.innerHTML = 'Visualization 2';
+    console.log('Viz 2 loading from vis2.js...');
 }
+
+// Viz 2 OLD CODE REMOVED - now in vis2.js
+/*
+function createViz2Old() {
+    let container = document.querySelector('#viz2 .viz-container');
+    container.innerHTML = '';
+    
+    // Add title and controls
+    let header = document.createElement('div');
+    header.style.cssText = 'display: flex; justify-content: space-between; align-items: center; margin: 10px; padding: 10px;';
+    
+    let title = document.createElement('h3');
+    title.textContent = 'NATO vs BRICS: Gold Reserve Balance';
+    title.style.margin = '0';
+    header.appendChild(title);
+    
+    container.appendChild(header);
+    
+    // Main visualization container
+    let vizDiv = document.createElement('div');
+    vizDiv.style.cssText = 'width: 100%; height: 700px; position: relative; display: flex; gap: 20px;';
+    container.appendChild(vizDiv);
+    
+    // Left panel for country selection
+    let leftPanel = document.createElement('div');
+    leftPanel.style.cssText = 'width: 250px; background: #f9f9f9; padding: 15px; overflow-y: auto; border-radius: 4px;';
+    vizDiv.appendChild(leftPanel);
+    
+    // Time slider controls
+    let timeControls = document.createElement('div');
+    timeControls.style.cssText = 'margin-bottom: 15px; padding-bottom: 15px; border-bottom: 2px solid #ddd;';
+    timeControls.innerHTML = `
+        <div style="font-weight: bold; margin-bottom: 10px;">Select Time Period</div>
+        <div id="viz2-time-display" style="text-align: center; font-size: 18px; font-weight: bold; color: #333; margin-bottom: 10px;">Loading...</div>
+        <input type="range" id="viz2-time-slider" style="width: 100%; margin-bottom: 10px;" min="0" max="100" value="0">
+        <button id="viz2-reset-btn" style="width: 100%; padding: 8px; background: #ff5722; color: white; border: none; border-radius: 4px; cursor: pointer; margin-top: 5px;">Reset Scale</button>
+    `;
+    leftPanel.appendChild(timeControls);
+    
+    // Quick compare button
+    let quickCompare = document.createElement('div');
+    quickCompare.style.cssText = 'margin-bottom: 15px; padding-bottom: 15px; border-bottom: 2px solid #ddd;';
+    quickCompare.innerHTML = `
+        <div style="font-weight: bold; margin-bottom: 10px;">Quick Compare</div>
+        <button id="viz2-compare-nato-brics" style="width: 100%; padding: 10px; cursor: pointer; border: none; border-radius: 4px; background: linear-gradient(90deg, #4A90E2 0%, #4A90E2 50%, #E8B923 50%, #E8B923 100%); color: white; font-weight: bold;">NATO vs BRICS</button>
+    `;
+    leftPanel.appendChild(quickCompare);
+    
+    // Alliance filter buttons
+    let allianceFilter = document.createElement('div');
+    allianceFilter.style.cssText = 'margin-bottom: 15px; padding-bottom: 15px; border-bottom: 2px solid #ddd;';
+    allianceFilter.innerHTML = `
+        <div style="font-weight: bold; margin-bottom: 10px;">Filter by Alliance</div>
+        <button id="viz2-filter-all" class="alliance-filter-btn active" style="width: 100%; padding: 6px; margin: 3px 0; cursor: pointer; border: none; border-radius: 3px;">All Countries</button>
+        <button id="viz2-filter-nato" class="alliance-filter-btn" style="width: 100%; padding: 6px; margin: 3px 0; cursor: pointer; border: none; border-radius: 3px; background: #4A90E2; color: white;">NATO Only</button>
+        <button id="viz2-filter-brics" class="alliance-filter-btn" style="width: 100%; padding: 6px; margin: 3px 0; cursor: pointer; border: none; border-radius: 3px; background: #E8B923; color: white;">BRICS Only</button>
+    `;
+    leftPanel.appendChild(allianceFilter);
+    
+    // Country list
+    let countryListDiv = document.createElement('div');
+    countryListDiv.id = 'viz2-country-list';
+    countryListDiv.style.cssText = 'display: flex; flex-direction: column; gap: 8px;';
+    leftPanel.appendChild(countryListDiv);
+    
+    // Canvas for Matter.js
+    let canvasContainer = document.createElement('div');
+    canvasContainer.style.cssText = 'flex: 1; position: relative; background: #f5f5f5; border: 2px solid #ddd; border-radius: 4px; min-height: 700px;';
+    canvasContainer.id = 'viz2-canvas-container';
+    vizDiv.appendChild(canvasContainer);
+    
+    console.log('Canvas container created with size:', canvasContainer.clientWidth, 'x', canvasContainer.clientHeight);
+    
+    // Weight displays
+    let weightsDiv = document.createElement('div');
+    weightsDiv.style.cssText = 'position: absolute; top: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 100px; z-index: 100; pointer-events: none;';
+    weightsDiv.innerHTML = `
+        <div style="text-align: center; background: rgba(100, 100, 100, 0.9); padding: 15px 25px; border-radius: 8px; color: white; font-weight: bold; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
+            <div style="font-size: 14px; margin-bottom: 5px;">Left Side</div>
+            <div id="viz2-left-weight" style="font-size: 24px;">0 t</div>
+        </div>
+        <div style="text-align: center; background: rgba(100, 100, 100, 0.9); padding: 15px 25px; border-radius: 8px; color: white; font-weight: bold; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
+            <div style="font-size: 14px; margin-bottom: 5px;">Right Side</div>
+            <div id="viz2-right-weight" style="font-size: 24px;">0 t</div>
+        </div>
+    `;
+    canvasContainer.appendChild(weightsDiv);
+    
+    // Legend
+    let legend = document.createElement('div');
+    legend.style.cssText = 'position: absolute; bottom: 20px; right: 20px; background: white; padding: 15px; border: 2px solid #ddd; border-radius: 4px; z-index: 100; pointer-events: none;';
+    legend.innerHTML = `
+        <div style="font-weight: bold; margin-bottom: 8px;">Alliances</div>
+        <div style="display: flex; align-items: center; margin: 4px 0;">
+            <div style="width: 20px; height: 20px; background: #4A90E2; margin-right: 8px; border-radius: 2px;"></div>
+            <span>NATO</span>
+        </div>
+        <div style="display: flex; align-items: center; margin: 4px 0;">
+            <div style="width: 20px; height: 20px; background: #E8B923; margin-right: 8px; border-radius: 2px;"></div>
+            <span>BRICS</span>
+        </div>
+        <div style="display: flex; align-items: center; margin: 4px 0;">
+            <div style="width: 20px; height: 20px; background: #888; margin-right: 8px; border-radius: 2px;"></div>
+            <span>Other</span>
+        </div>
+        <div style="margin-top: 10px; font-size: 12px; color: #666;">
+            Drag countries onto the scale<br>Left = Blue side, Right = Gold side
+        </div>
+    `;
+    canvasContainer.appendChild(legend);
+    
+    // Load gold reserves data and initialize
+    d3.csv('../w6_datasets/gold_reserves_annual_quarterly_monthly.csv').then(function(csvData) {
+        initViz2(csvData, canvasContainer);
+    });
+}
+
+function initViz2(csvData, canvasContainer) {
+    // NATO countries (current members)
+    const natoCountries = [
+        "Albania", "Belgium", "Bulgaria", "Canada", "Croatia", "Czechia",
+        "Denmark", "Estonia", "Finland", "France", "Germany", "Greece", "Hungary",
+        "Iceland", "Italy", "Latvia", "Lithuania", "Luxembourg", "Montenegro",
+        "Netherlands", "North Macedonia", "Norway", "Poland", "Portugal", "Romania",
+        "Slovakia", "Slovenia", "Spain", "Sweden", "Turkey", "United Kingdom", "United States"
+    ];
+    
+    // BRICS countries (expanded members) - will use mappings to find correct CSV names
+    const bricsCountriesRaw = [
+        "Brazil", 
+        "Russia",
+        "India", 
+        "China", 
+        "South Africa",
+        "Egypt",
+        "Ethiopia", 
+        "Indonesia", 
+        "Iran", 
+        "United Arab Emirates"
+    ];
+    
+    // Load country name mapping from correct path
+    let countryNameMap = {};
+    d3.json('../json/CountryMapIMF.json').then(function(mapping) {
+        countryNameMap = mapping;
+        console.log('Country mapping loaded successfully');
+        processGoldData();
+    }).catch((error) => {
+        // If JSON fails to load, continue without mapping
+        console.error('Failed to load CountryMapIMF.json:', error);
+        processGoldData();
+    });
+    
+    function normalizeCountryName(name) {
+        return countryNameMap[name] || name;
+    }
+    
+    // Process gold data by time period
+    let goldDataByPeriod = {};
+    let timePeriods = [];
+    let currentPeriodIndex = 0;
+    let currentFilter = 'all';
+    
+    function processGoldData() {
+        // Filter for monthly data only
+        const monthlyData = csvData.filter(d => d.period === 'month');
+        
+        // Group by time period
+        monthlyData.forEach(row => {
+            const period = row['Time Period'];
+            const countryRaw = row['Country Name'];
+            const tonnes = parseFloat(row['tonnes']);
+            
+            if (!period || isNaN(tonnes) || tonnes <= 0) return;
+            
+            // Skip aggregated regions
+            if (countryRaw.includes('Economies') || countryRaw.includes('World')) return;
+            
+            const country = normalizeCountryName(countryRaw);
+            
+            if (!goldDataByPeriod[period]) {
+                goldDataByPeriod[period] = {};
+            }
+            goldDataByPeriod[period][country] = tonnes;
+        });
+        
+        // Get sorted time periods
+        timePeriods = Object.keys(goldDataByPeriod).sort();
+        
+        if (timePeriods.length === 0) {
+            console.error('No time periods found in data');
+            return;
+        }
+        
+        // Set to most recent period
+        currentPeriodIndex = timePeriods.length - 1;
+        
+        // Setup time slider
+        const timeSlider = document.getElementById('viz2-time-slider');
+        timeSlider.max = timePeriods.length - 1;
+        timeSlider.value = currentPeriodIndex;
+        
+        timeSlider.addEventListener('input', function(e) {
+            currentPeriodIndex = parseInt(e.target.value);
+            updateTimeDisplay();
+            updateCountryList();
+        });
+        
+        // Setup reset button
+        document.getElementById('viz2-reset-btn').addEventListener('click', resetScale);
+        
+        // Setup NATO vs BRICS comparison button
+        document.getElementById('viz2-compare-nato-brics').addEventListener('click', compareNATOvsBRICS);
+        
+        // Setup alliance filter buttons
+        document.getElementById('viz2-filter-all').addEventListener('click', () => setFilter('all'));
+        document.getElementById('viz2-filter-nato').addEventListener('click', () => setFilter('nato'));
+        document.getElementById('viz2-filter-brics').addEventListener('click', () => setFilter('brics'));
+        
+        // Initialize visualization
+        updateTimeDisplay();
+        initMatterJS();
+        updateCountryList();
+    }
+    
+    function setFilter(filter) {
+        currentFilter = filter;
+        document.querySelectorAll('.alliance-filter-btn').forEach(btn => {
+            btn.classList.remove('active');
+            btn.style.opacity = '0.7';
+        });
+        
+        const activeBtn = filter === 'all' ? 'viz2-filter-all' : 
+                         filter === 'nato' ? 'viz2-filter-nato' : 'viz2-filter-brics';
+        document.getElementById(activeBtn).classList.add('active');
+        document.getElementById(activeBtn).style.opacity = '1';
+        
+        updateCountryList();
+    }
+    
+    function updateTimeDisplay() {
+        const period = timePeriods[currentPeriodIndex];
+        document.getElementById('viz2-time-display').textContent = period;
+    }
+    
+    function getAlliance(country) {
+        // Check NATO
+        if (natoCountries.includes(country)) return 'NATO';
+        
+        // Check BRICS - need to check all variations
+        const bricsVariationsMap = {
+            "Brazil": ["Brazil"],
+            "Russia": ["Russian Federation", "Russia"],
+            "India": ["India"],
+            "China": ["China, People's Republic of", "China, P.R.: Mainland", "China"],
+            "South Africa": ["South Africa", "South Africa, Rep. of"],
+            "Egypt": ["Egypt, Arab Republic of", "Egypt"],
+            "Ethiopia": ["Ethiopia"],
+            "Indonesia": ["Indonesia"],
+            "Iran": ["Iran, Islamic Republic of", "Iran"],
+            "United Arab Emirates": ["United Arab Emirates", "UAE"]
+        };
+        
+        for (let bricsCountry in bricsVariationsMap) {
+            if (bricsVariationsMap[bricsCountry].includes(country)) {
+                return 'BRICS';
+            }
+        }
+        
+        return 'Other';
+    }
+    
+    function getAllianceColor(alliance) {
+        if (alliance === 'NATO') return '#4A90E2';
+        if (alliance === 'BRICS') return '#E8B923';
+        return '#888888';
+    }
+    
+    function updateCountryList() {
+        const period = timePeriods[currentPeriodIndex];
+        const currentData = goldDataByPeriod[period] || {};
+        
+        const countryListDiv = document.getElementById('viz2-country-list');
+        countryListDiv.innerHTML = '';
+        
+        // Get countries with data
+        let countriesWithData = Object.keys(currentData)
+            .filter(country => currentData[country] > 0)
+            .map(country => ({
+                name: country,
+                tonnes: currentData[country],
+                alliance: getAlliance(country)
+            }))
+            .filter(item => {
+                if (currentFilter === 'all') return true;
+                if (currentFilter === 'nato') return item.alliance === 'NATO';
+                if (currentFilter === 'brics') return item.alliance === 'BRICS';
+                return true;
+            })
+            .sort((a, b) => b.tonnes - a.tonnes);
+        
+        // Create draggable country bars
+        countriesWithData.forEach(item => {
+            const barDiv = document.createElement('div');
+            barDiv.className = 'gold-bar-draggable';
+            barDiv.style.cssText = `
+                padding: 10px;
+                background: linear-gradient(135deg, ${getAllianceColor(item.alliance)} 0%, ${getAllianceColor(item.alliance)}dd 100%);
+                color: white;
+                border-radius: 4px;
+                cursor: grab;
+                user-select: none;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+                font-size: 12px;
+                transition: transform 0.1s;
+            `;
+            barDiv.innerHTML = `
+                <div style="font-weight: bold;">${item.name}</div>
+                <div style="font-size: 11px; opacity: 0.9;">${item.tonnes.toFixed(1)} tonnes</div>
+                <div style="font-size: 10px; opacity: 0.8;">${item.alliance}</div>
+            `;
+            
+            barDiv.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.05)';
+            });
+            barDiv.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1)';
+            });
+            
+            // Make it draggable onto the scale
+            barDiv.addEventListener('mousedown', function(e) {
+                startDragCountry(item, e);
+            });
+            
+            countryListDiv.appendChild(barDiv);
+        });
+    }
+    
+    // Matter.js physics setup
+    let engine, render, world, mouseConstraint, runner;
+    let leftPlatform, rightPlatform, fulcrum, beam;
+    let leftBodies = [];
+    let rightBodies = [];
+    let goldBars = []; // Track all gold bars for rendering text
+    
+    function initMatterJS() {
+        // Wait for container to be rendered
+        setTimeout(() => {
+            const width = canvasContainer.clientWidth || 800;
+            const height = canvasContainer.clientHeight || 700;
+            
+            console.log('Initializing Matter.js with canvas size:', width, 'x', height);
+            
+            // Create engine with stronger gravity
+            engine = Matter.Engine.create({
+                gravity: { x: 0, y: 0.8 }
+            });
+            world = engine.world;
+        
+        // Create renderer
+        render = Matter.Render.create({
+            element: canvasContainer,
+            engine: engine,
+            options: {
+                width: width,
+                height: height,
+                wireframes: false,
+                background: '#ffffff'
+            }
+        });
+        
+        // Scale positioning - lower in the canvas
+        const fulcrumX = width / 2;
+        const fulcrumY = height - 150;
+        
+        // Create fulcrum (triangle base) - larger and more visible
+        const fulcrumSize = 40;
+        fulcrum = Matter.Bodies.polygon(fulcrumX, fulcrumY, 3, fulcrumSize, {
+            isStatic: true,
+            render: {
+                fillStyle: '#333333',
+                strokeStyle: '#000000',
+                lineWidth: 2
+            },
+            angle: 0
+        });
+        
+        // Create beam (the balance bar) - longer and positioned on fulcrum
+        const beamWidth = 600;
+        const beamHeight = 10;
+        const beamY = fulcrumY - fulcrumSize + 5;
+        beam = Matter.Bodies.rectangle(fulcrumX, beamY, beamWidth, beamHeight, {
+            render: {
+                fillStyle: '#8B4513',
+                strokeStyle: '#654321',
+                lineWidth: 2
+            },
+            friction: 1.0,
+            restitution: 0.1
+        });
+        
+        // Create platforms on each side - larger to hold more countries
+        const platformWidth = 240;
+        const platformHeight = 8;
+        const platformOffset = 270;
+        
+        leftPlatform = Matter.Bodies.rectangle(
+            fulcrumX - platformOffset, 
+            beamY - 5, 
+            platformWidth, 
+            platformHeight, 
+            {
+                render: {
+                    fillStyle: '#4A90E2',
+                    strokeStyle: '#2E5C8A',
+                    lineWidth: 2
+                },
+                friction: 1.0,
+                restitution: 0.05
+            }
+        );
+        
+        rightPlatform = Matter.Bodies.rectangle(
+            fulcrumX + platformOffset, 
+            beamY - 5, 
+            platformWidth, 
+            platformHeight, 
+            {
+                render: {
+                    fillStyle: '#E8B923',
+                    strokeStyle: '#B8921C',
+                    lineWidth: 2
+                },
+                friction: 1.0,
+                restitution: 0.05
+            }
+        );
+        
+        // Connect beam to fulcrum with revolute constraint (pivot point)
+        const beamConstraint = Matter.Constraint.create({
+            bodyA: beam,
+            pointA: { x: 0, y: 0 },
+            pointB: { x: fulcrumX, y: beamY },
+            stiffness: 1,
+            length: 0,
+            render: { visible: false }
+        });
+        
+        // Connect platforms to beam - fixed to beam ends
+        const leftConstraint = Matter.Constraint.create({
+            bodyA: beam,
+            bodyB: leftPlatform,
+            pointA: { x: -platformOffset, y: 0 },
+            pointB: { x: 0, y: 0 },
+            stiffness: 1,
+            length: 0,
+            render: { visible: false }
+        });
+        
+        const rightConstraint = Matter.Constraint.create({
+            bodyA: beam,
+            bodyB: rightPlatform,
+            pointA: { x: platformOffset, y: 0 },
+            pointB: { x: 0, y: 0 },
+            stiffness: 1,
+            length: 0,
+            render: { visible: false }
+        });
+        
+        // Add walls to keep things contained
+        const walls = [
+            // Ground
+            Matter.Bodies.rectangle(width / 2, height + 25, width * 2, 50, { 
+                isStatic: true, 
+                render: { fillStyle: '#e0e0e0' } 
+            }),
+            // Left wall
+            Matter.Bodies.rectangle(-25, height / 2, 50, height * 2, { 
+                isStatic: true, 
+                render: { visible: false } 
+            }),
+            // Right wall
+            Matter.Bodies.rectangle(width + 25, height / 2, 50, height * 2, { 
+                isStatic: true, 
+                render: { visible: false } 
+            })
+        ];
+        
+        // Add all bodies to world
+        Matter.World.add(world, [
+            fulcrum, beam, leftPlatform, rightPlatform,
+            beamConstraint, leftConstraint, rightConstraint,
+            ...walls
+        ]);
+        
+        // Mouse control for interactivity
+        const mouse = Matter.Mouse.create(render.canvas);
+        mouseConstraint = Matter.MouseConstraint.create(engine, {
+            mouse: mouse,
+            constraint: {
+                stiffness: 0.2,
+                render: { visible: false }
+            }
+        });
+        Matter.World.add(world, mouseConstraint);
+        
+        // Render text labels on gold bars after each render
+        Matter.Events.on(render, 'afterRender', function() {
+            const ctx = render.context;
+            
+            goldBars.forEach(bar => {
+                if (!bar.countryData) return;
+                
+                const pos = bar.position;
+                const angle = bar.angle;
+                
+                ctx.save();
+                ctx.translate(pos.x, pos.y);
+                ctx.rotate(angle);
+                
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold 8px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                
+                // Truncate long names
+                let displayName = bar.countryData.name;
+                if (displayName.length > 14) {
+                    displayName = displayName.substring(0, 12) + '..';
+                }
+                
+                ctx.fillText(displayName, 0, -4);
+                ctx.font = '7px Arial';
+                ctx.fillText(bar.countryData.tonnes.toFixed(0) + 't', 0, 6);
+                
+                ctx.restore();
+            });
+        });
+        
+            // Run the engine and renderer with Runner (recommended API)
+            runner = Matter.Runner.create();
+            Matter.Runner.run(runner, engine);
+            Matter.Render.run(render);
+            
+            console.log('Matter.js physics engine started');
+            console.log('Scale components:', { fulcrum, beam, leftPlatform, rightPlatform });
+            
+            // Update weights continuously
+            setInterval(updateWeights, 100);
+        }, 100); // Wait 100ms for DOM to be ready
+    }
+    
+    let draggedCountry = null;
+    let dragOverlay = null;
+    
+    function startDragCountry(country, e) {
+        draggedCountry = country;
+        
+        // Create a draggable overlay
+        dragOverlay = document.createElement('div');
+        dragOverlay.style.cssText = `
+            position: fixed;
+            padding: 10px;
+            background: linear-gradient(135deg, ${getAllianceColor(country.alliance)} 0%, ${getAllianceColor(country.alliance)}dd 100%);
+            color: white;
+            border-radius: 4px;
+            pointer-events: none;
+            z-index: 10000;
+            font-size: 12px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            opacity: 0.9;
+        `;
+        dragOverlay.innerHTML = `
+            <div style="font-weight: bold;">${country.name}</div>
+            <div style="font-size: 11px;">${country.tonnes.toFixed(1)} tonnes</div>
+        `;
+        document.body.appendChild(dragOverlay);
+        
+        function onMouseMove(e) {
+            dragOverlay.style.left = (e.pageX + 10) + 'px';
+            dragOverlay.style.top = (e.pageY + 10) + 'px';
+        }
+        
+        function onMouseUp(e) {
+            document.removeEventListener('mousemove', onMouseMove);
+            document.removeEventListener('mouseup', onMouseUp);
+            
+            if (dragOverlay) {
+                document.body.removeChild(dragOverlay);
+                dragOverlay = null;
+            }
+            
+            // Check if dropped on canvas
+            const rect = canvasContainer.getBoundingClientRect();
+            if (e.clientX >= rect.left && e.clientX <= rect.right &&
+                e.clientY >= rect.top && e.clientY <= rect.bottom) {
+                dropCountryOnScale(country, e.clientX - rect.left, e.clientY - rect.top);
+            }
+            
+            draggedCountry = null;
+        }
+        
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
+        
+        onMouseMove(e);
+    }
+    
+    function dropCountryOnScale(country, x, y, forceLeft = null) {
+        const width = canvasContainer.clientWidth;
+        const centerX = width / 2;
+        
+        // Determine which side based on drop position or forced side
+        const isLeftSide = forceLeft !== null ? forceLeft : x < centerX;
+        
+        // Create smaller gold bar body to fit more countries
+        const barWidth = 60;
+        const barHeight = 22;
+        
+        // Physical weight based on gold reserves (scaled down for physics)
+        const density = Math.max(0.001, country.tonnes / 5000);
+        
+        const goldBar = Matter.Bodies.rectangle(x, y, barWidth, barHeight, {
+            density: density,
+            friction: 0.8,
+            restitution: 0.2,
+            render: {
+                fillStyle: getAllianceColor(country.alliance),
+                strokeStyle: '#ffffff',
+                lineWidth: 1.5
+            },
+            label: country.name,
+            chamfer: { radius: 2 }
+        });
+        
+        // Store country data
+        goldBar.countryData = country;
+        
+        Matter.World.add(world, goldBar);
+        goldBars.push(goldBar);
+        
+        if (isLeftSide) {
+            leftBodies.push(goldBar);
+        } else {
+            rightBodies.push(goldBar);
+        }
+    }
+    
+    function updateWeights() {
+        let leftWeight = 0;
+        let rightWeight = 0;
+        
+        leftBodies.forEach(body => {
+            if (body.countryData) {
+                leftWeight += body.countryData.tonnes;
+            }
+        });
+        
+        rightBodies.forEach(body => {
+            if (body.countryData) {
+                rightWeight += body.countryData.tonnes;
+            }
+        });
+        
+        document.getElementById('viz2-left-weight').textContent = leftWeight.toFixed(1) + ' t';
+        document.getElementById('viz2-right-weight').textContent = rightWeight.toFixed(1) + ' t';
+    }
+    
+    function compareNATOvsBRICS() {
+        // Reset scale first
+        resetScale();
+        
+        const period = timePeriods[currentPeriodIndex];
+        const currentData = goldDataByPeriod[period] || {};
+        
+        // Get NATO countries with data - need to match CSV names
+        const natoCountriesMapping = {
+            "Albania": "Albania",
+            "Belgium": "Belgium",
+            "Bulgaria": "Bulgaria",
+            "Canada": "Canada",
+            "Croatia": "Croatia",
+            "Czechia": "Czech Republic",
+            "Denmark": "Denmark",
+            "Estonia": "Estonia",
+            "Finland": "Finland",
+            "France": "France",
+            "Germany": "Germany",
+            "Greece": "Greece",
+            "Hungary": "Hungary",
+            "Iceland": "Iceland",
+            "Italy": "Italy",
+            "Latvia": "Latvia",
+            "Lithuania": "Lithuania",
+            "Luxembourg": "Luxembourg",
+            "Montenegro": "Montenegro",
+            "Netherlands": "Netherlands, The",
+            "North Macedonia": "North Macedonia, Republic of",
+            "Norway": "Norway",
+            "Poland": "Poland, Republic of",
+            "Portugal": "Portugal",
+            "Romania": "Romania",
+            "Slovakia": "Slovak Republic",
+            "Slovenia": "Slovenia",
+            "Spain": "Spain",
+            "Sweden": "Sweden",
+            "Turkey": "Turkey",
+            "United Kingdom": "United Kingdom",
+            "United States": "United States"
+        };
+        
+        const natoCountriesWithData = natoCountries
+            .filter(country => {
+                const csvName = natoCountriesMapping[country] || country;
+                return currentData[csvName] && currentData[csvName] > 0;
+            })
+            .map(country => {
+                const csvName = natoCountriesMapping[country] || country;
+                return {
+                    name: csvName,
+                    tonnes: currentData[csvName],
+                    alliance: 'NATO'
+                };
+            });
+        
+        // Get BRICS countries with data - try multiple name variations
+        const bricsCountriesWithData = [];
+        
+        // BRICS country name variations - all possible CSV names from the data
+        const bricsVariationsMap = {
+            "Brazil": ["Brazil"],
+            "Russia": ["Russian Federation", "Russia"],
+            "India": ["India"],
+            "China": ["China, People's Republic of", "China, P.R.: Mainland", "China"],
+            "South Africa": ["South Africa", "South Africa, Rep. of"],
+            "Egypt": ["Egypt, Arab Republic of", "Egypt"],
+            "Ethiopia": ["Ethiopia"],
+            "Indonesia": ["Indonesia"],
+            "Iran": ["Iran, Islamic Republic of", "Iran"],
+            "United Arab Emirates": ["United Arab Emirates", "UAE"]
+        };
+        
+        bricsCountriesRaw.forEach(country => {
+            const variations = bricsVariationsMap[country] || [country];
+            for (let variant of variations) {
+                if (currentData[variant] && currentData[variant] > 0) {
+                    bricsCountriesWithData.push({
+                        name: variant,
+                        tonnes: currentData[variant],
+                        alliance: 'BRICS'
+                    });
+                    break; // Found it, move to next country
+                }
+            }
+        });
+        
+        console.log('BRICS countries found:', bricsCountriesWithData.length, bricsCountriesWithData);
+        
+        const width = canvasContainer.clientWidth;
+        const fulcrumX = width / 2;
+        const fulcrumY = canvasContainer.clientHeight / 2 + 50;
+        const platformOffset = 200;
+        
+        // Add NATO countries to left side - spread them out vertically
+        natoCountriesWithData.forEach((country, index) => {
+            const x = fulcrumX - platformOffset + (Math.random() - 0.5) * 80;
+            const y = 50 + (index * 30);
+            setTimeout(() => {
+                dropCountryOnScale(country, x, y, true);
+            }, index * 80);
+        });
+        
+        // Add BRICS countries to right side
+        bricsCountriesWithData.forEach((country, index) => {
+            const x = fulcrumX + platformOffset + (Math.random() - 0.5) * 80;
+            const y = 50 + (index * 30);
+            setTimeout(() => {
+                dropCountryOnScale(country, x, y, false);
+            }, index * 80);
+        });
+    }
+    
+    function resetScale() {
+        // Remove all gold bars
+        goldBars.forEach(body => Matter.World.remove(world, body));
+        
+        leftBodies = [];
+        rightBodies = [];
+        goldBars = [];
+        
+        updateWeights();
+    }
+}
+*/
+// END OF VIZ 2 OLD CODE
 
 // Viz 3
 function createViz3() {
