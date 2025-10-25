@@ -62,6 +62,12 @@ function createViz2() {
     `;
     leftPanel.appendChild(allianceFilter);
     
+    // Country list title
+    let countryListTitle = document.createElement('div');
+    countryListTitle.style.cssText = 'font-weight: bold; margin-bottom: 10px; color: #333; font-size: 14px;';
+    countryListTitle.textContent = 'Countries: Drag to one side of the scale to place';
+    leftPanel.appendChild(countryListTitle);
+    
     // Country list
     let countryListDiv = document.createElement('div');
     countryListDiv.id = 'viz2-country-list';
@@ -151,10 +157,10 @@ function initViz2(csvData, canvasContainer) {
     
     // Explanation dictionary for different comparison buttons
     const explanationTexts = {
-        'g7-brics': 'G7 vs BRICS: This comparison shows the total gold reserves of G7 countries (blue) versus BRICS countries (gold). G7 includes 7 major advanced economies, while BRICS represents 10 major emerging economies. This analysis reveals the strategic gold holdings between established economic powers and emerging economic powers.',
-        'g7-brics-top3': 'G7 vs BRICS (Top 3): This focused comparison displays only the top 3 gold-holding countries from each group. This provides a clearer view of the most significant players in each group, highlighting the concentration of gold reserves among the largest economies in each alliance.',
-        'top10-rest': 'Top 10 vs Rest of World: This analysis compares the gold reserves of the world\'s top 10 gold-holding countries against the combined reserves of all other nations. This reveals the global distribution of gold wealth and shows how concentrated gold reserves are among a small number of countries.',
-        'top3-rest': 'Top 3 vs Rest of World: This comparison pits the world\'s top 3 gold-holding countries against the combined reserves of all other nations. This extreme comparison highlights the massive concentration of gold wealth among just three countries versus the entire rest of the world.',
+        'g7-brics': 'G7 VS BRICS\n\nThe G7 represents the leading Western industrialised nations anchored around the US dollar. The BRICS grouping (Brazil, Russia, India, China, South Africa) emerged in 2009 as a coalition of major emerging economies seeking greater autonomy from Western-dominated institutions.\n\nThe US formally ended conversion of the dollar to gold in 1971, transitioning away from the gold‐standard era.\nFederal Reserve History\n\nToday, BRICS nations have become heavy net buyers of gold as a reserve asset, while many G7 members have been net sellers',
+        'g7-brics-top3': 'G7 VS BRICS\n\nThe G7 represents the leading Western industrialised nations anchored around the US dollar. The BRICS grouping (Brazil, Russia, India, China, South Africa) emerged in 2009 as a coalition of major emerging economies seeking greater autonomy from Western-dominated institutions.\n\nThe US formally ended conversion of the dollar to gold in 1971, transitioning away from the gold‐standard era.\nFederal Reserve History\n\nToday, BRICS nations have become heavy net buyers of gold as a reserve asset, while many G7 members have been net sellers',
+        'top10-rest': 'Top 10 Gold Holders\n\nWhile the top 10 gold reserves have long been dominated by G7 countries, BRICS members have steadily climbed the ranks. In 2002, China became a consistent top 10 holder, marking the start of a long-term accumulation trend. Russia followed in 2008, expanding its reserves rapidly as part of a broader move to reduce reliance on the US dollar. In 2009, India joined the top 10 after a major gold purchase from the IMF. Turkey entered the list in 2013 and has remained a top holder since, later expressing interest in joining the BRICS alliance in 2018.',
+        'top3-rest': 'Top 3 vs Rest of the World\n\nThe world\'s top three gold holders have shifted slightly over the years, but they have consistently remained G7 nations, often including Switzerland. Switzerland\'s large reserves reflect its historic role as a global gold trading and refining hub, as well as a traditional safe haven for wealth. Before 2015, these top holders collectively owned more gold than the entire rest of the world combined. Around 2015, however, emerging economies collectively surpassed them, as countries such as China, Russia, Turkey, and India began rapidly increasing their reserves. This marked a turning point in global reserve behavior, with non-Western central banks becoming the dominant buyers of gold and signaling a gradual move away from reliance on the US dollar.',
         'default': 'Click a comparison button to see detailed information about the gold reserve analysis. Each comparison reveals different aspects of global gold distribution and strategic reserves.'
     };
     
@@ -283,7 +289,7 @@ function initViz2(csvData, canvasContainer) {
         const explanationText = explanationTexts[explanationKey] || explanationTexts['default'];
         const explanationElement = document.getElementById('viz2-explanation-text');
         if (explanationElement) {
-            explanationElement.textContent = explanationText;
+            explanationElement.innerHTML = explanationText.replace(/\n/g, '<br>');
         }
     }
     
