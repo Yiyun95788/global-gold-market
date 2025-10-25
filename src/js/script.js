@@ -1231,7 +1231,363 @@ function initViz2(csvData, canvasContainer) {
 // Viz 3
 function createViz3() {
     let container = document.querySelector('#viz3 .viz-container');
-    container.innerHTML = 'Visualization 3';
+    container.innerHTML = '';
+    
+    // Set up dimensions
+    const width = 800;
+    const height = 500;
+    
+    // Create main container with controls
+    const mainContainer = d3.select(container)
+        .append('div')
+        .style('display', 'flex')
+        .style('flex-direction', 'column')
+        .style('align-items', 'center')
+        .style('gap', '10px');
+    
+    // Add title
+    mainContainer.append('h3')
+        .text('Gold Reserves by Country - Start of Year Comparison')
+        .style('margin', '0')
+        .style('text-align', 'center');
+    
+    // Add controls container
+    const controlsContainer = mainContainer.append('div')
+        .style('display', 'flex')
+        .style('align-items', 'center')
+        .style('gap', '20px')
+        .style('margin-bottom', '10px')
+        .style('flex-wrap', 'wrap')
+        .style('justify-content', 'center');
+    
+    // Year controls
+    const yearControls = controlsContainer.append('div')
+        .style('display', 'flex')
+        .style('align-items', 'center')
+        .style('gap', '10px');
+    
+    yearControls.append('label')
+        .text('Year:')
+        .style('font-weight', 'bold');
+    
+    const yearSlider = yearControls.append('input')
+        .attr('type', 'range')
+        .attr('id', 'yearSlider-viz3')
+        .style('width', '200px');
+    
+    const yearDisplay = yearControls.append('span')
+        .attr('id', 'yearValue-viz3')
+        .style('font-weight', 'bold')
+        .style('min-width', '50px');
+    
+    // Data type selector
+    const dataTypeControls = controlsContainer.append('div')
+        .style('display', 'flex')
+        .style('align-items', 'center')
+        .style('gap', '10px');
+    
+    dataTypeControls.append('label')
+        .text('Data Type:')
+        .style('font-weight', 'bold');
+    
+    const dataTypeSelect = dataTypeControls.append('select')
+        .attr('id', 'dataTypeSelect-viz3')
+        .style('padding', '5px 10px')
+        .style('border', '1px solid #ccc')
+        .style('border-radius', '4px')
+        .style('font-size', '14px');
+    
+    dataTypeSelect.append('option')
+        .attr('value', 'reserves')
+        .text('Gold Reserves');
+    
+    dataTypeSelect.append('option')
+        .attr('value', 'production')
+        .text('Gold Production');
+    
+    dataTypeSelect.append('option')
+        .attr('value', 'both')
+        .text('Both Reserves & Production');
+    
+    // Create SVG
+    const svg = mainContainer.append('svg')
+        .attr('width', width)
+        .attr('height', height);
+    
+    const projection = d3.geoNaturalEarth1()
+        .scale(120)
+        .translate([width / 2, height / 2]);
+    
+    const path = d3.geoPath().projection(projection);
+    
+    // Color scale for gold reserves - using vibrant blue gradient
+    const colorScale = d3.scaleSequential()
+        .domain([0, 1]) // Will be updated with actual data range
+        .interpolator(t => {
+            // Custom interpolation from light blue to deep navy
+            if (t < 0.2) return d3.interpolateRgb("#E6F3FF", "#4A90E2")(t * 5); // Light blue to medium blue
+            if (t < 0.4) return d3.interpolateRgb("#4A90E2", "#1E3A8A")((t - 0.2) * 5); // Medium blue to dark blue
+            if (t < 0.6) return d3.interpolateRgb("#1E3A8A", "#1E40AF")((t - 0.4) * 5); // Dark blue to deeper blue
+            if (t < 0.8) return d3.interpolateRgb("#1E40AF", "#1E3A8A")((t - 0.6) * 5); // Deeper blue to navy
+            return d3.interpolateRgb("#1E3A8A", "#0F172A")((t - 0.8) * 5); // Navy to very dark navy
+        });
+    
+    // Load world map data, gold reserves data, and country mapping
+    Promise.all([
+        d3.json('https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson'),
+        d3.csv('../src/data/gold_reserves_annual_quarterly_monthly.csv'),
+        d3.json('../src/json/GeoJSON.json')
+    ]).then(function([world, goldData, countryMapping]) {
+        
+        // Process data to get the first data point in the year for each country and year
+        const reservesByCountryAndYear = {};
+        const availableYears = new Set();
+        
+        // Define exclusions for regional/economic groupings and historical entities
+        const exclusions = [
+            'Advanced Economies',
+            'CIS',
+            'Central African Economic and Monetary Community',
+            'Emerging and Developing Asia',
+            'Emerging and Developing Countries',
+            'Emerging and Developing Europe',
+            'Euro Area',
+            'Europe',
+            'Middle East, North Africa, Afghanistan, and Pakistan',
+            'Sub-Saharan Africa',
+            'West African Economic and Monetary Union (WAEMU)',
+            'Western Hemisphere',
+            'World',
+            'Czechoslovakia',
+            'Netherlands Antilles',
+            'Yugoslavia, SFR'
+        ];
+        
+        goldData.forEach(d => {
+            const country = d['Country Name'];
+            const tonnes = +d.tonnes;
+            const timePeriod = d['Time Period'];
+            const period = d.period; // Use the period column from CSV
+            
+            if (isNaN(tonnes) || tonnes <= 0) return;
+            if (!country || !timePeriod) return;
+            
+            // Skip if this is a grouped entity or historical entity
+            if (exclusions.includes(country)) {
+                return;
+            }
+            
+            // Parse time period to get year
+            let year;
+            
+            if (timePeriod.includes('Q')) {
+                // Quarter format: 1995Q1 -> year=1995
+                year = parseInt(timePeriod.split('Q')[0]);
+            } else if (timePeriod.includes('-')) {
+                // Month format: 2004-02 -> year=2004
+                year = parseInt(timePeriod.split('-')[0]);
+            } else {
+                // Annual data
+                year = parseInt(timePeriod);
+            }
+            
+            if (!year || isNaN(year)) return;
+            
+            // Initialize country data if not exists
+            if (!reservesByCountryAndYear[country]) {
+                reservesByCountryAndYear[country] = {};
+            }
+            
+            // Store data if we don't have any data for this country/year yet
+            if (!reservesByCountryAndYear[country][year]) {
+                reservesByCountryAndYear[country][year] = {
+                    tonnes: tonnes,
+                    timePeriod: timePeriod,
+                    period: period
+                };
+                availableYears.add(year);
+            }
+        });
+        
+        
+        
+        // Convert years to sorted array
+        const years = Array.from(availableYears).sort((a, b) => a - b);
+                
+        if (years.length === 0) {
+            container.innerHTML = '<p>No valid gold reserves data found.</p>';
+            return;
+        }
+        
+        // Set up slider
+        yearSlider
+            .attr('min', years[0])
+            .attr('max', years[years.length - 1])
+            .attr('value', years[0])
+            .attr('step', 1);
+        
+        yearDisplay.text(years[0]);        
+
+        // Function to draw map for specific year
+        function drawMap(selectedYear) {
+            
+            // Clear existing map
+            svg.selectAll('.country').remove();
+            svg.selectAll('.legend').remove();
+            svg.selectAll('.tooltip').remove();
+            
+            // Get data for selected year
+            const reservesForYear = {};
+            Object.entries(reservesByCountryAndYear).forEach(([country, countryData]) => {
+                if (countryData[selectedYear]) {
+                    reservesForYear[country] = countryData[selectedYear];
+                }
+            });
+            
+            
+            
+            
+            // Calculate min/max reserves for color scaling
+            const reservesValues = Object.values(reservesForYear).map(d => d.tonnes);
+            const minReserves = Math.min(...reservesValues);
+            const maxReserves = Math.max(...reservesValues);
+            
+            // Update color scale domain
+            colorScale.domain([minReserves, maxReserves]);
+            
+            // Draw the map
+            svg.selectAll('.country')
+                .data(world.features)
+                .enter()
+                .append('path')
+                .attr('class', 'country')
+                .attr('d', path)
+                .attr('fill', d => {
+                    // Find matching country data
+                    const countryName = d.properties.NAME || d.properties.name;
+                    const countryData = reservesForYear[countryName];
+                    
+                    if (countryData) {
+                        return colorScale(countryData.tonnes);
+                    }
+                    return '#f0f0f0'; // Default color for countries without data
+                })
+                .attr('stroke', '#333')
+                .attr('stroke-width', 0.5)
+                .on('mouseover', function(event, d) {
+                    const countryName = d.properties.NAME || d.properties.name;
+                    const countryData = reservesForYear[countryName];
+                    
+                    d3.select(this)
+                        .attr('stroke', '#000')
+                        .attr('stroke-width', 2);
+                    
+                    if (countryData) {
+                        const tooltip = svg.append('g')
+                            .attr('class', 'tooltip')
+                            .attr('transform', `translate(${event.offsetX}, ${event.offsetY})`);
+                        
+                        tooltip.append('rect')
+                            .attr('x', 0)
+                            .attr('y', 0)
+                            .attr('width', 200)
+                            .attr('height', 60)
+                            .attr('fill', 'white')
+                            .attr('stroke', '#333')
+                            .attr('rx', 5);
+                        
+                        tooltip.append('text')
+                            .attr('x', 10)
+                            .attr('y', 20)
+                            .attr('font-size', '14px')
+                            .attr('font-weight', 'bold')
+                            .text(countryName);
+                        
+                        tooltip.append('text')
+                            .attr('x', 10)
+                            .attr('y', 40)
+                            .attr('font-size', '12px')
+                            .text(`Gold Reserves: ${countryData.tonnes.toLocaleString()} tonnes`);
+                    }
+                })
+                .on('mouseout', function() {
+                    d3.select(this)
+                        .attr('stroke', '#333')
+                        .attr('stroke-width', 0.5);
+                    
+                    svg.selectAll('.tooltip').remove();
+                });
+            
+            // Add legend
+            const legend = svg.append('g')
+                .attr('class', 'legend')
+                .attr('transform', `translate(${width - 150}, 30)`);
+            
+            const legendScale = d3.scaleLinear()
+                .domain([minReserves, maxReserves])
+                .range([0, 100]);
+            
+            const legendAxis = d3.axisRight(legendScale)
+                .ticks(5)
+                .tickFormat(d3.format('.0f'));
+            
+            legend.append('g')
+                .attr('class', 'legend-axis')
+                .call(legendAxis);
+            
+            // Add legend title
+            legend.append('text')
+                .attr('x', 10)
+                .attr('y', -10)
+                .attr('text-anchor', 'start')
+                .attr('font-size', '12px')
+                .text('Gold Reserves (tonnes)');
+            
+            // Create gradient for legend
+            const defs = svg.append('defs');
+            const gradient = defs.append('linearGradient')
+                .attr('id', 'legend-gradient')
+                .attr('x1', '0%')
+                .attr('x2', '0%')
+                .attr('y1', '0%')
+                .attr('y2', '100%');
+            
+            gradient.selectAll('stop')
+                .data(d3.range(0, 1.1, 0.1))
+                .enter()
+                .append('stop')
+                .attr('offset', d => `${d * 100}%`)
+                .attr('stop-color', d => {
+                    const value = minReserves + d * (maxReserves - minReserves);
+                    return colorScale(value);
+                });
+            
+            legend.append('rect')
+                .attr('x', -10)
+                .attr('y', 0)
+                .attr('width', 15)
+                .attr('height', 100)
+                .attr('fill', 'url(#legend-gradient)')
+                .attr('stroke', '#333');
+        }
+        
+        drawMap(years[0]);
+        
+        // Add slider event listener
+        yearSlider.on('input', function() {
+            const selectedYear = parseInt(this.value);
+            yearDisplay.text(selectedYear);
+            drawMap(selectedYear);
+        });
+        
+        // Add data type selector event listener (placeholder - functionality not implemented yet)
+        dataTypeSelect.on('change', function() {
+            const selectedDataType = this.value;
+            console.log('Data type changed to:', selectedDataType);
+            // TODO: Implement functionality to switch between reserves, production, or both
+            // This will be implemented in future iterations
+        });
+    })
 }
 
 // Viz 4
