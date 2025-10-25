@@ -1335,8 +1335,8 @@ function createViz3() {
     // Load world map data, gold reserves data, and country mapping
     Promise.all([
         d3.json('https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson'),
-        d3.csv('../src/data/gold_reserves_annual_quarterly_monthly.csv'),
-        d3.json('../src/json/GeoJSON.json')
+        d3.csv('../docs/data/gold_reserves_annual_quarterly_monthly.csv'),
+        d3.json('../docs/json/GeoJSON.json')
     ]).then(function([world, goldData, countryMapping]) {
         
         // Process data to get the first data point in the year for each country and year
