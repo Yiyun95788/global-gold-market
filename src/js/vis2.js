@@ -7,9 +7,12 @@ function createViz2() {
     let header = document.createElement('div');
     header.style.cssText = 'display: flex; justify-content: space-between; align-items: center; margin: 10px; padding: 10px;';
     
-    let title = document.createElement('h3');
-    title.textContent = 'NATO vs BRICS: Gold Reserve Balance - Drag the countries onto the scale to compare gold reserves';
+    let title = document.createElement('div');
     title.style.margin = '0';
+    title.innerHTML = `
+        <div style="font-size: 18px; font-weight: 700;">Gold Reserve Balances (1950-2019)</div>
+        <div style="font-size: 12px; color: #555; margin-top: 2px;">Drag the countries onto the scale to compare gold reserves</div>
+    `;
     header.appendChild(title);
     
     container.appendChild(header);
@@ -55,7 +58,7 @@ function createViz2() {
         <button id="viz2-filter-all" class="alliance-filter-btn active" style="width: 100%; padding: 6px; margin: 3px 0; cursor: pointer; border: none; border-radius: 3px;">All Countries</button>
         <button id="viz2-filter-nato" class="alliance-filter-btn" style="width: 100%; padding: 6px; margin: 3px 0; cursor: pointer; border: none; border-radius: 3px; background: #4A90E2; color: white;">NATO Only</button>
         <button id="viz2-filter-brics" class="alliance-filter-btn" style="width: 100%; padding: 6px; margin: 3px 0; cursor: pointer; border: none; border-radius: 3px; background: #E8B923; color: white;">BRICS Only</button>
-        <input id="viz2-search" type="text" placeholder="Search countries..." style="margin-top: 10px; width: 100%; padding: 8px 10px; border: 1px solid #ccc; border-radius: 4px;" />
+        <input id="viz2-search" type="text" placeholder="Search countries..." style="margin-top: 10px; width: 100%; box-sizing: border-box; padding: 8px 10px; border: 1px solid #ccc; border-radius: 4px;" />
     `;
     leftPanel.appendChild(allianceFilter);
     
