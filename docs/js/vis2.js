@@ -1,3 +1,195 @@
+// ========== ANIMATION SYSTEM ==========
+// Reusable animations and effects
+const AnimationLibrary = {
+    // Pulsate: scale element with glow
+    pulsate: function(element, duration = 2000, intensity = 1.2) {
+        if (!element) return;
+        const keyframes = `@keyframes pulse-${Math.random().toString(36).substr(2, 9)} {
+            0% { transform: scale(1); filter: drop-shadow(0 0 0px rgba(255, 223, 0, 0.8)); }
+            50% { transform: scale(${intensity}); filter: drop-shadow(0 0 15px rgba(255, 223, 0, 0.8)); }
+            100% { transform: scale(1); filter: drop-shadow(0 0 0px rgba(255, 223, 0, 0.8)); }
+        }`;
+        const style = document.createElement('style');
+        style.innerHTML = keyframes;
+        document.head.appendChild(style);
+        
+        const animationName = keyframes.match(/pulse-\w+/)[0];
+        element.style.animation = `${animationName} ${duration}ms infinite`;
+        
+        return () => {
+            element.style.animation = 'none';
+            style.remove();
+        };
+    },
+    
+    // Highlight: add border/glow
+    highlight: function(element, color = '#FFD700', width = 3) {
+        if (!element) return;
+        element.style.border = `${width}px solid ${color}`;
+        element.style.boxShadow = `0 0 20px ${color}, inset 0 0 20px ${color}33`;
+        element.style.borderRadius = '8px';
+        return () => {
+            element.style.border = 'none';
+            element.style.boxShadow = 'none';
+        };
+    },
+    
+    // Remove highlight
+    removeHighlight: function(element) {
+        if (!element) return;
+        element.style.border = 'none';
+        element.style.boxShadow = 'none';
+        element.style.borderRadius = '0';
+    },
+    
+    // Overlay with pointer that follows the target on scroll/resize
+    createOverlay: function(element, message = '', arrowDirection = 'top') {
+        const overlay = document.createElement('div');
+        overlay.style.cssText = `
+            position: fixed; /* use viewport coords to match getBoundingClientRect */
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            z-index: 10001;
+            font-size: 14px;
+            max-width: 250px;
+            word-wrap: break-word;
+        `;
+        overlay.innerHTML = `<div style="margin-bottom: 8px;">${message}</div>
+            <div style="font-size: 12px; opacity: 0.8;">click back/next or left/right arrow keys to continue</div>`;
+
+        const updatePosition = () => {
+            if (!element) return;
+            const rect = element.getBoundingClientRect();
+            overlay.style.left = rect.left + rect.width / 2 - 125 + 'px';
+            if (arrowDirection === 'top') {
+                overlay.style.top = rect.top - 100 + 'px';
+            } else {
+                overlay.style.top = rect.bottom + 20 + 'px';
+            }
+        };
+
+        // Attach listeners to follow scroll/resize (including scrollable ancestors)
+        const scrollParents = [];
+        const getScrollParents = (node) => {
+            let parent = node && node.parentElement;
+            while (parent && parent !== document.body) {
+                const style = window.getComputedStyle(parent);
+                if (/(auto|scroll)/.test(style.overflow + style.overflowY + style.overflowX)) {
+                    scrollParents.push(parent);
+                }
+                parent = parent.parentElement;
+            }
+        };
+        if (element) getScrollParents(element);
+
+        const boundUpdate = () => updatePosition();
+        window.addEventListener('scroll', boundUpdate, true);
+        window.addEventListener('resize', boundUpdate);
+        scrollParents.forEach(p => p.addEventListener('scroll', boundUpdate));
+
+        document.body.appendChild(overlay);
+        updatePosition();
+
+        // Stash cleanup to remove listeners later
+        overlay.__overlayCleanup = () => {
+            window.removeEventListener('scroll', boundUpdate, true);
+            window.removeEventListener('resize', boundUpdate);
+            scrollParents.forEach(p => p.removeEventListener('scroll', boundUpdate));
+        };
+
+        return overlay;
+    },
+    
+    // Remove overlay (and its listeners if present)
+    removeOverlay: function(overlay) {
+        if (!overlay) return;
+        if (typeof overlay.__overlayCleanup === 'function') {
+            try { overlay.__overlayCleanup(); } catch (e) {}
+            overlay.__overlayCleanup = null;
+        }
+        if (overlay.parentNode) {
+            overlay.parentNode.removeChild(overlay);
+        }
+    },
+    
+    // Fade element in/out
+    fade: function(element, isIn = true, duration = 300) {
+        if (!element) return;
+        element.style.transition = `opacity ${duration}ms ease`;
+        element.style.opacity = isIn ? '1' : '0';
+        element.style.pointerEvents = isIn ? 'auto' : 'none';
+    }
+};
+
+// ========== TUTORIAL SYSTEM ==========
+class TutorialStage {
+    constructor(name, actions = []) {
+        this.name = name;
+        this.actions = actions;
+        this.cleanupFunctions = [];
+    }
+    
+    async execute() {
+        for (let action of this.actions) {
+            await action(this);
+        }
+    }
+    
+    cleanup() {
+        this.cleanupFunctions.forEach(fn => fn());
+        this.cleanupFunctions = [];
+    }
+    
+    addCleanup(fn) {
+        this.cleanupFunctions.push(fn);
+    }
+}
+
+class Tutorial {
+    constructor(stages) {
+        this.stages = stages;
+        this.currentStage = 0;
+        this.isActive = false;
+    }
+    
+    async goToStage(index) {
+        if (index < 0 || index >= this.stages.length) return;
+        
+        if (this.currentStage !== null && this.stages[this.currentStage]) {
+            this.stages[this.currentStage].cleanup();
+        }
+        
+        this.currentStage = index;
+        await this.stages[this.currentStage].execute();
+    }
+    
+    async nextStage() {
+        if (this.currentStage < this.stages.length - 1) {
+            await this.goToStage(this.currentStage + 1);
+        }
+    }
+    
+    async prevStage() {
+        if (this.currentStage > 0) {
+            await this.goToStage(this.currentStage - 1);
+        }
+    }
+    
+    async start() {
+        this.isActive = true;
+        await this.goToStage(0);
+    }
+    
+    end() {
+        this.isActive = false;
+        if (this.stages[this.currentStage]) {
+            this.stages[this.currentStage].cleanup();
+        }
+    }
+}
+
 // Viz 2 - NATO vs BRICS Gold Balance Scale
 function createViz2() {
     let container = document.querySelector('#viz2 .viz-container');
@@ -7,13 +199,103 @@ function createViz2() {
     let header = document.createElement('div');
     header.style.cssText = 'display: flex; justify-content: space-between; align-items: center; margin: 10px; padding: 10px;';
     
+    // Left: Title
     let title = document.createElement('div');
-    title.style.margin = '0';
+    title.style.cssText = 'margin: 0; text-align: left; flex: 1;';
     title.innerHTML = `
         <div style="font-size: 18px; font-weight: 700;">Gold Reserve Balances (1950-2019)</div>
         <div style="font-size: 12px; color: #555; margin-top: 2px;">Drag the countries onto the scale to compare gold reserves</div>
     `;
     header.appendChild(title);
+    
+    // Middle: Tutorial controls
+    let tutorialControls = document.createElement('div');
+    tutorialControls.style.cssText = 'display: flex; align-items: center; gap: 10px; flex: 1; justify-content: center;';
+    
+    // Back button (hidden initially)
+    let backBtn = document.createElement('button');
+    backBtn.style.cssText = `
+        background: #4A90E2;
+        color: #fff;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+        display: none;
+        transition: transform 0.2s, box-shadow 0.2s;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        white-space: nowrap;
+    `;
+    backBtn.textContent = '← Back';
+    backBtn.onmouseover = () => {
+        backBtn.style.transform = 'scale(1.05)';
+        backBtn.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
+    };
+    backBtn.onmouseout = () => {
+        backBtn.style.transform = 'scale(1)';
+        backBtn.style.boxShadow = '0 2px 8px rgba(0,0,0,0.2)';
+    };
+    tutorialControls.appendChild(backBtn);
+    
+    // Main tutorial button
+    let tutorialBtn = document.createElement('button');
+    tutorialBtn.style.cssText = `
+        background: #4CAF50;
+        color: #fff;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 14px;
+        white-space: nowrap;
+        transition: transform 0.2s, box-shadow 0.2s;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    `;
+    tutorialBtn.textContent = '▶ Walkthrough';
+    tutorialBtn.onmouseover = () => {
+        tutorialBtn.style.transform = 'scale(1.05)';
+        tutorialBtn.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
+    };
+    tutorialBtn.onmouseout = () => {
+        tutorialBtn.style.transform = 'scale(1)';
+        tutorialBtn.style.boxShadow = '0 2px 8px rgba(0,0,0,0.2)';
+    };
+    tutorialControls.appendChild(tutorialBtn);
+    
+    // Forward button (hidden initially)
+    let forwardBtn = document.createElement('button');
+    forwardBtn.style.cssText = `
+        background: #4A90E2;
+        color: #fff;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+        display: none;
+        transition: transform 0.2s, box-shadow 0.2s;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        white-space: nowrap;
+    `;
+    forwardBtn.textContent = 'Next →';
+    forwardBtn.onmouseover = () => {
+        forwardBtn.style.transform = 'scale(1.05)';
+        forwardBtn.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
+    };
+    forwardBtn.onmouseout = () => {
+        forwardBtn.style.transform = 'scale(1)';
+        forwardBtn.style.boxShadow = '0 2px 8px rgba(0,0,0,0.2)';
+    };
+    tutorialControls.appendChild(forwardBtn);
+    
+    header.appendChild(tutorialControls);
+    
+    // Right spacer
+    let rightSpacer = document.createElement('div');
+    rightSpacer.style.cssText = 'flex: 1;';
+    header.appendChild(rightSpacer);
     
     container.appendChild(header);
     
@@ -130,11 +412,11 @@ function createViz2() {
     
     // Load gold reserves data and initialize
     d3.csv('../w6_datasets/gold_reserves_annual_quarterly_monthly.csv').then(function(csvData) {
-        initViz2(csvData, canvasContainer);
+        initViz2(csvData, canvasContainer, tutorialBtn, backBtn, forwardBtn);
     });
 }
 
-function initViz2(csvData, canvasContainer) {
+function initViz2(csvData, canvasContainer, tutorialBtn, backBtn, forwardBtn) {
     console.log('Initializing Viz2 with', csvData.length, 'data rows');
     
     // G7 countries
@@ -294,8 +576,26 @@ function initViz2(csvData, canvasContainer) {
     }
     
     function getAlliance(country) {
-        if (g7Countries.includes(country)) return 'G7';
-        
+        // Normalize via mapping if available
+        const normalized = (countryNameMap && countryNameMap[country]) ? countryNameMap[country] : country;
+
+        // G7 detection (account for common variations)
+        const g7Variations = {
+            "United States of America": ["United States of America", "United States", "USA", "U.S."],
+            "United Kingdom": ["United Kingdom", "United Kingdom of Great Britain and Northern Ireland", "UK", "U.K.", "Great Britain"],
+            "Germany": ["Germany", "Germany, Federal Republic of"],
+            "France": ["France"],
+            "Italy": ["Italy"],
+            "Japan": ["Japan"],
+            "Canada": ["Canada"]
+        };
+        if (g7Countries.includes(normalized)) return 'G7';
+        for (const key in g7Variations) {
+            const variants = g7Variations[key];
+            if (variants.includes(country) || variants.includes(normalized)) return 'G7';
+        }
+
+        // BRICS detection
         const bricsVariations = {
             "Brazil": ["Brazil"],
             "Russia": ["Russian Federation", "Russia"],
@@ -308,13 +608,12 @@ function initViz2(csvData, canvasContainer) {
             "Iran": ["Iran, Islamic Republic of", "Iran"],
             "United Arab Emirates": ["United Arab Emirates", "UAE"]
         };
-        
+        if (Array.isArray(bricsCountriesRaw) && bricsCountriesRaw.includes(normalized)) return 'BRICS';
         for (let bricsCountry in bricsVariations) {
-            if (bricsVariations[bricsCountry].includes(country)) {
-                return 'BRICS';
-            }
+            const variants = bricsVariations[bricsCountry];
+            if (variants.includes(country) || variants.includes(normalized)) return 'BRICS';
         }
-        
+
         return 'Other';
     }
     
@@ -853,4 +1152,284 @@ function initViz2(csvData, canvasContainer) {
             window.resetD3Scale();
         }
     }
+    
+    // ========== TUTORIAL STAGES ==========
+    const tutorialStages = [
+        // Stage 1: Explore the scale
+        new TutorialStage('Stage 1: Meet the Scale', [
+            async (stage) => {
+                const svg = canvasContainer.querySelector('svg');
+                const cleanup = AnimationLibrary.pulsate(svg, 2000, 1.1);
+                stage.addCleanup(cleanup);
+                
+                const overlay = AnimationLibrary.createOverlay(
+                    svg,
+                    'This is a scale that compares countries\' gold reserves.',
+                    'top'
+                );
+                stage.addCleanup(() => AnimationLibrary.removeOverlay(overlay));
+                
+                await new Promise(r => setTimeout(r, 500));
+            }
+        ]),
+        
+        // Stage 2: Use the time slider
+        new TutorialStage('Stage 2: Navigate Time', [
+            async (stage) => {
+                const timeSlider = document.getElementById('viz2-time-slider');
+                const cleanup = AnimationLibrary.highlight(timeSlider, '#FFD700', 2);
+                stage.addCleanup(cleanup);
+                
+                const overlay = AnimationLibrary.createOverlay(
+                    timeSlider,
+                    'Use this slider to explore different time periods. Drag it to 1952.',
+                    'bottom'
+                );
+                stage.addCleanup(() => AnimationLibrary.removeOverlay(overlay));
+                
+                await new Promise(r => setTimeout(r, 4000));
+            }
+        ]),
+        
+        // Stage 3: G7 vs BRICS button
+        new TutorialStage('Stage 3: Compare Alliances', [
+            async (stage) => {
+                const compareBtn = document.getElementById('viz2-compare-g7-brics');
+                const cleanup = AnimationLibrary.pulsate(compareBtn, 1500, 1.15);
+                stage.addCleanup(cleanup);
+                
+                const overlay = AnimationLibrary.createOverlay(
+                    compareBtn,
+                    'Click this button to see how G7 and BRICS gold reserves compare!',
+                    'top'
+                );
+                stage.addCleanup(() => AnimationLibrary.removeOverlay(overlay));
+                
+                await new Promise(r => setTimeout(r, 4000));
+            }
+        ]),
+        
+        // Stage 4: Highlight scale boxes
+        new TutorialStage('Stage 4: Read the Scale', [
+            async (stage) => {
+                const weightDisplay = document.querySelector('[id^="viz2-left-weight"], [id^="viz2-right-weight"]').parentElement;
+                const cleanup = AnimationLibrary.highlight(weightDisplay, '#4A90E2', 2);
+                stage.addCleanup(cleanup);
+                
+                const overlay = AnimationLibrary.createOverlay(
+                    weightDisplay,
+                    'These boxes show the total weight on each side of the scale.Observe how G7 has about 22k more tonnes than BRICS!'
+                );
+                stage.addCleanup(() => AnimationLibrary.removeOverlay(overlay));
+                
+                await new Promise(r => setTimeout(r, 4000));
+            }
+        ]),
+        
+        // Stage 5: Scale Information
+        new TutorialStage('Stage 5: Scale Information', [
+            async (stage) => {
+                const explanationBox = document.getElementById('viz2-explanation');
+                const cleanup = AnimationLibrary.highlight(explanationBox, '#4CAF50', 2);
+                stage.addCleanup(cleanup);
+                
+                const overlay = AnimationLibrary.createOverlay(
+                    explanationBox,
+                    'Get the context of the comparison here. This box provides detailed information about what you\'re viewing.',
+                    'bottom'
+                );
+                stage.addCleanup(() => AnimationLibrary.removeOverlay(overlay));
+                
+                await new Promise(r => setTimeout(r, 3000));
+            }
+        ]),
+        
+        // Stage 6: Navigate to 2019
+        new TutorialStage('Stage 6: Navigate to 2019', [
+            async (stage) => {
+                const timeSlider = document.getElementById('viz2-time-slider');
+                const cleanup = AnimationLibrary.highlight(timeSlider, '#FFD700', 2);
+                stage.addCleanup(cleanup);
+                
+                const overlay = AnimationLibrary.createOverlay(
+                    timeSlider,
+                    'Now drag the slider to 2019 to see the most recent data.',
+                    'bottom'
+                );
+                stage.addCleanup(() => AnimationLibrary.removeOverlay(overlay));
+                
+                await new Promise(r => setTimeout(r, 3000));
+            }
+        ]),
+        
+        // Stage 7: Click G7 vs BRICS Again
+        new TutorialStage('Stage 7: Compare Again', [
+            async (stage) => {
+                const compareBtn = document.getElementById('viz2-compare-g7-brics');
+                const cleanup = AnimationLibrary.pulsate(compareBtn, 1500, 1.15);
+                stage.addCleanup(cleanup);
+                
+                const overlay = AnimationLibrary.createOverlay(
+                    compareBtn,
+                    'Click the G7 vs BRICS button again to see the comparison in 2019.',
+                    'top'
+                );
+                stage.addCleanup(() => AnimationLibrary.removeOverlay(overlay));
+                
+                await new Promise(r => setTimeout(r, 3000));
+            }
+        ]),
+        
+        // Stage 8: Highlight Weight Difference
+        new TutorialStage('Stage 8: Changed Balance', [
+            async (stage) => {
+                const weightsDiv = document.getElementById('viz2-left-weight').parentElement.parentElement;
+                const cleanup = AnimationLibrary.highlight(weightsDiv, '#FF5722', 2);
+                stage.addCleanup(cleanup);
+                
+                const overlay = AnimationLibrary.createOverlay(
+                    weightsDiv,
+                    'The difference has dramatically dropped to around 12k tonnes, as G7 sells gold and BRICS buys gold.',
+                    'bottom'
+                );
+                stage.addCleanup(() => AnimationLibrary.removeOverlay(overlay));
+                
+                await new Promise(r => setTimeout(r, 4000));
+            }
+        ]),
+        
+        // Stage 9: Quick Compare Buttons
+        new TutorialStage('Stage 9: Quick Comparisons', [
+            async (stage) => {
+                const quickCompareSection = document.getElementById('viz2-compare-g7-brics').parentElement;
+                const cleanup = AnimationLibrary.highlight(quickCompareSection, '#9C27B0', 2);
+                stage.addCleanup(cleanup);
+                
+                const overlay = AnimationLibrary.createOverlay(
+                    quickCompareSection,
+                    'Here is a list of comparisons to take note of. These buttons let you quickly compare different groups.',
+                    'bottom'
+                );
+                stage.addCleanup(() => AnimationLibrary.removeOverlay(overlay));
+                
+                await new Promise(r => setTimeout(r, 4000));
+            }
+        ]),
+        
+        // Stage 10: Reset Scale
+        new TutorialStage('Stage 10: Reset Scale', [
+            async (stage) => {
+                const resetBtn = document.getElementById('viz2-reset-btn');
+                const cleanup = AnimationLibrary.pulsate(resetBtn, 1500, 1.15);
+                stage.addCleanup(cleanup);
+                
+                const overlay = AnimationLibrary.createOverlay(
+                    resetBtn,
+                    'Click this button to reset the scale and clear all countries from both sides.',
+                    'top'
+                );
+                stage.addCleanup(() => AnimationLibrary.removeOverlay(overlay));
+                
+                await new Promise(r => setTimeout(r, 3000));
+            }
+        ]),
+        
+        // Stage 11: Alliance Filters
+        new TutorialStage('Stage 11: Alliance Filters', [
+            async (stage) => {
+                const filterSection = document.getElementById('viz2-filter-all').parentElement;
+                const cleanup = AnimationLibrary.highlight(filterSection, '#FF5722', 2);
+                stage.addCleanup(cleanup);
+                
+                const overlay = AnimationLibrary.createOverlay(
+                    filterSection,
+                    'These filters let you view countries by two major economic alliances: G7 and BRICS.',
+                    'top'
+                );
+                stage.addCleanup(() => AnimationLibrary.removeOverlay(overlay));
+                
+                await new Promise(r => setTimeout(r, 3000));
+            }
+        ]),
+        
+        // Stage 12: Drag Countries
+        new TutorialStage('Stage 12: Drag Countries', [
+            async (stage) => {
+                const countryList = document.getElementById('viz2-country-list');
+                const cleanup = AnimationLibrary.highlight(countryList, '#E8B923', 2);
+                stage.addCleanup(cleanup);
+                
+                const overlay = AnimationLibrary.createOverlay(
+                    countryList,
+                    'You can drag countries onto one side of the scale to compare them. Try it yourself!',
+                    'top'
+                );
+                stage.addCleanup(() => AnimationLibrary.removeOverlay(overlay));
+                
+                await new Promise(r => setTimeout(r, 3000));
+            }
+        ]),
+        
+        // Stage 13: End
+        new TutorialStage('Stage 13: Walkthrough Complete!', [
+            async (stage) => {
+                const overlay = document.createElement('div');
+                overlay.style.cssText = `
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    background: rgba(76, 175, 80, 0.95);
+                    color: white;
+                    padding: 30px 40px;
+                    border-radius: 12px;
+                    z-index: 10001;
+                    font-size: 18px;
+                    font-weight: bold;
+                    text-align: center;
+                    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+                `;
+                overlay.innerHTML = `
+                    <div style="font-size: 24px; margin-bottom: 10px;">🎉 Walkthrough Complete!</div>
+                    <div style="font-size: 16px; font-weight: normal;">You\'re ready to explore the visualization.</div>
+                    <div style="font-size: 14px; margin-top: 15px; opacity: 0.9;">Click "End" to close this walkthrough.</div>
+                `;
+                document.body.appendChild(overlay);
+                stage.addCleanup(() => {
+                    if (overlay.parentNode) {
+                        overlay.parentNode.removeChild(overlay);
+                    }
+                });
+                
+                await new Promise(r => setTimeout(r, 5000));
+            }
+        ])
+    ];
+    
+    const tutorial = new Tutorial(tutorialStages);
+    
+    // Tutorial button click handler
+    tutorialBtn.onclick = async () => {
+        if (tutorial.isActive) {
+            tutorial.end();
+            tutorialBtn.textContent = '▶ Walkthrough';
+            backBtn.style.display = 'none';
+            forwardBtn.style.display = 'none';
+        } else {
+            await tutorial.start();
+            tutorialBtn.textContent = '⏹ End';
+            backBtn.style.display = 'inline-block';
+            forwardBtn.style.display = 'inline-block';
+        }
+    };
+    
+    // Forward button click handler
+    forwardBtn.onclick = async () => {
+        await tutorial.nextStage();
+    };
+    
+    // Back button click handler
+    backBtn.onclick = async () => {
+        await tutorial.prevStage();
+    };
 }
