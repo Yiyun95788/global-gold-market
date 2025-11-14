@@ -1,221 +1,350 @@
-body {
+/* ==================== GLOBAL STYLES ==================== */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lato:wght@300;400;700&display=swap');
+
+* {
     margin: 0;
-    font-family: Arial, sans-serif;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-header {
-    padding: 20px;
-    text-align: center;
-    border-bottom: 1px solid #ccc;
+body {
+    font-family: 'Lato', sans-serif;
+    color: #2c3e50;
+    background: #FAF9F6;
+    overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Cinzel', serif;
+    color: #1a1f3a;
+}
+
+/* ==================== FULLPAGE SECTIONS ==================== */
+.section {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     position: relative;
 }
 
-h1 {
-    margin: 0;
-    font-size: 24px;
+.section.fp-auto-height {
+    height: auto !important;
 }
 
-.story-btn {
+.section.scrollable {
+    overflow-y: auto;
+    height: 100vh;
+}
+
+/* Gold texture overlay for all sections */
+.section::before {
+    content: '';
     position: absolute;
-    top: 20px;
-    right: 20px;
-    padding: 10px 20px;
-    background: #333;
-    color: white;
-    border: none;
-    cursor: pointer;
-    font-size: 14px;
-}
-
-.story-btn:hover {
-    background: #555;
-}
-
-.story-overlay {
-    position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.7);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.03) 0%, rgba(255, 215, 0, 0.05) 100%);
+    pointer-events: none;
+    z-index: 0;
 }
 
-.story-overlay.hidden {
-    display: none;
-}
-
-.story-content {
-    background: white;
-    padding: 40px;
-    max-width: 700px;
-    width: 90%;
+.section > div {
     position: relative;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    z-index: 1;
 }
 
-.close-btn {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: none;
-    border: none;
-    font-size: 30px;
-    cursor: pointer;
-    color: #333;
+/* ==================== COLOR PALETTE ==================== */
+:root {
+    --gold-primary: #D4AF37;
+    --gold-light: #FFD700;
+    --gold-dark: #B8860B;
+    --bronze: #CD7F32;
+    --navy: #1a1f3a;
+    --navy-light: #2c3e50;
+    --cream: #FAF9F6;
+    --white: #FFFFFF;
 }
 
-.close-btn:hover {
-    color: #000;
-}
-
-.story-content h2 {
-    margin-top: 0;
-    margin-bottom: 20px;
-    font-size: 22px;
-}
-
-.story-content p {
-    line-height: 1.6;
-    margin-bottom: 30px;
-    font-size: 16px;
-}
-
-.story-nav {
+/* ==================== HOME PAGE ==================== */
+#home-page {
+    background: linear-gradient(135deg, #1a1f3a 0%, #2c3e50 100%);
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    margin-top: 20px;
-}
-
-.story-nav button {
-    padding: 10px 20px;
-    background: #333;
-    color: white;
-    border: none;
-    cursor: pointer;
-    font-size: 16px;
-}
-
-.story-nav button:hover {
-    background: #555;
-}
-
-.story-nav button:disabled {
-    background: #ccc;
-    cursor: not-allowed;
-}
-
-#pageIndicator {
-    font-size: 14px;
-    color: #666;
-}
-
-nav {
-    display: flex;
-    border-bottom: 2px solid #333;
-}
-
-.tab-btn {
-    padding: 15px 30px;
-    background: white;
-    border: none;
-    border-right: 1px solid #ccc;
-    cursor: pointer;
-    font-size: 14px;
-}
-
-.tab-btn:hover {
-    background: #f0f0f0;
-}
-
-.tab-btn.active {
-    background: #333;
-    color: white;
-}
-
-.tab-content {
-    display: none;
-    padding: 20px;
-}
-
-.tab-content.active {
-    display: block;
-}
-
-h2 {
-    margin-top: 0;
-    font-size: 20px;
-}
-
-.viz-container {
-    width: 100%;
-    height: 600px;
-    border: 1px solid #ddd;
-    margin-top: 20px;
-}
-
-.controls {
-    display: flex;
-    gap: 15px;
-    padding: 20px;
     justify-content: center;
-    border-top: 1px solid #e0e0e0;
-    background: #ffffff;
 }
 
+/* ==================== VISUALIZATION PAGES LAYOUT ==================== */
+.viz-page-container {
+    width: 100%;
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 40px;
+    display: grid;
+    grid-template-columns: 400px 1fr;
+    gap: 40px;
+    align-items: start;
+    min-height: 100vh;
+}
+
+/* Stacked layout for complex full-width visualizations */
+.viz-page-container.stacked {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    padding: 60px 80px;
+    max-width: 1900px;
+}
+
+.viz-page-container.stacked .viz-text-section {
+    position: relative;
+    top: 0;
+    max-width: 1000px;
+    padding: 0;
+}
+
+.viz-page-container.stacked .viz-visual-section {
+    width: 100%;
+    padding: 40px;
+    min-height: 700px;
+}
+
+.viz-text-section {
+    padding: 20px;
+    position: sticky;
+    top: 40px;
+}
+
+.viz-text-section h2 {
+    font-size: 2.2rem;
+    color: var(--gold-primary);
+    margin-bottom: 20px;
+    font-weight: 700;
+}
+
+.viz-text-section .subtitle {
+    font-size: 1.2rem;
+    color: var(--navy-light);
+    margin-bottom: 20px;
+    font-weight: 300;
+}
+
+.viz-text-section p {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--navy-light);
+    margin-bottom: 15px;
+}
+
+.viz-text-section .highlight-box {
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(255, 215, 0, 0.15) 100%);
+    border-left: 4px solid var(--gold-primary);
+    padding: 15px;
+    margin: 20px 0;
+    border-radius: 4px;
+}
+
+.viz-visual-section {
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    overflow: visible;
+}
+
+/* ==================== TRANSITION PAGE ==================== */
+#transition-page {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ==================== TEXT-ONLY PAGES ==================== */
+#balance-text-page,
+#map-text-page,
+#regime-text-page {
+    background: linear-gradient(135deg, #FAF9F6 0%, #F5F3EF 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ==================== CONCLUSION PAGE ==================== */
+#conclusion-page {
+    background: linear-gradient(135deg, #2c3e50 0%, #1a1f3a 100%);
+}
+
+/* ==================== DECORATIVE ELEMENTS ==================== */
+.gold-accent {
+    color: var(--gold-primary);
+    font-weight: 700;
+}
+
+.gold-underline {
+    border-bottom: 3px solid var(--gold-primary);
+    padding-bottom: 5px;
+    display: inline-block;
+}
+
+.gold-divider {
+    width: 80px;
+    height: 3px;
+    background: linear-gradient(90deg, var(--gold-primary) 0%, var(--gold-light) 100%);
+    margin: 20px 0;
+}
+
+/* ==================== NAVIGATION DOTS ==================== */
+#fp-nav ul li a span {
+    background: var(--gold-primary);
+}
+
+#fp-nav ul li a.active span,
+#fp-nav ul li:hover a.active span {
+    background: var(--gold-light);
+    box-shadow: 0 0 10px var(--gold-light);
+}
+
+#fp-nav ul li .fp-tooltip {
+    color: var(--navy);
+    font-family: 'Lato', sans-serif;
+}
+
+/* ==================== ANIMATIONS ==================== */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes goldShimmer {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.fade-in-up {
+    animation: fadeInUp 0.8s ease-out;
+}
+
+/* ==================== BUTTONS ==================== */
+.gold-button {
+    background: linear-gradient(135deg, var(--gold-primary) 0%, var(--gold-light) 100%);
+    color: var(--navy);
+    border: none;
+    padding: 12px 30px;
+    font-size: 16px;
+    font-weight: 700;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    font-family: 'Lato', sans-serif;
+}
+
+.gold-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+}
+
+/* ==================== TOOLTIP ==================== */
+.tooltip {
+    position: absolute;
+    background: var(--navy);
+    color: white;
+    padding: 10px 15px;
+    border-radius: 6px;
+    pointer-events: none;
+    font-size: 14px;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--gold-primary);
+}
+
+/* ==================== VIZ-SPECIFIC STYLES ==================== */
+
+/* Heatmap styles */
 .heatmap-cell {
     stroke: #ffffff;
     stroke-width: 2px;
     transition: opacity 0.2s ease;
+    cursor: pointer;
 }
 
 .heatmap-cell:hover {
     opacity: 0.7;
 }
 
-.heatmap-label {
-    font-size: 12px;
-    fill: #555;
+/* Map styles */
+.country {
+    stroke: #333;
+    stroke-width: 0.5;
+    transition: stroke 0.2s ease, stroke-width 0.2s ease;
 }
 
-.heatmap-value {
-    font-size: 11px;
-    pointer-events: none;
+.country:hover {
+    stroke: #000;
+    stroke-width: 2;
 }
 
-.tooltip {
-    position: absolute;
-    background: #2c3e50;
-    color: white;
-    padding: 8px 12px;
-    border-radius: 6px;
-    pointer-events: none;
-    font-size: 13px;
-    z-index: 1000;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    transition: opacity 0.2s ease;
+/* Balance scale styles */
+.gold-bar-draggable {
+    transition: transform 0.2s ease;
 }
 
-.asset-btn{
-    padding: 8px 16px;
-    border-radius: 10px;
-    border: 1px solid #D1D5DB;
-    background: #fff;
-    cursor: pointer;
-    font-weight: 600;
-}
-.asset-btn.active{
-    background: #111827;
-    color: #fff;
-    border-color: #111827;
-}
-.asset-btn:disabled{
-    opacity: .45;
-    cursor: not-allowed;
+.gold-bar-draggable:hover {
+    transform: scale(1.05);
 }
 
-.quilt-tip { z-index: 9999; }
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 1200px) {
+    .viz-page-container {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+    
+    .viz-page-container.stacked {
+        padding: 30px 40px;
+    }
+    
+    .viz-text-section h2 {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .viz-page-container {
+        padding: 20px;
+    }
+    
+    .viz-page-container.stacked {
+        padding: 20px;
+    }
+    
+    .viz-text-section h2 {
+        font-size: 1.75rem;
+    }
+    
+    .viz-text-section p {
+        font-size: 1rem;
+    }
+    
+    .viz-visual-section {
+        padding: 15px;
+    }
+    
+    .viz-page-container.stacked .viz-visual-section {
+        padding: 20px;
+        min-height: 400px;
+    }
+}
