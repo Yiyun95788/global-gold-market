@@ -316,6 +316,7 @@ function createViz2() {
         <div style="font-weight: bold; margin-bottom: 10px;">Select Time Period</div>
         <div id="viz2-time-display" style="text-align: center; font-size: 18px; font-weight: bold; color: #333; margin-bottom: 10px;">Loading...</div>
         <input type="range" id="viz2-time-slider" style="width: 100%; margin-bottom: 10px;" min="0" max="100" value="0">
+        <button id="viz2-play-pause-btn" style="width: 100%; padding: 8px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; margin-top: 5px; font-weight: bold;">▶ Play</button>
         <button id="viz2-reset-btn" style="width: 100%; padding: 8px; background: #ff5722; color: white; border: none; border-radius: 4px; cursor: pointer; margin-top: 5px;">Reset Scale</button>
     `;
     leftPanel.appendChild(timeControls);
@@ -502,6 +503,60 @@ function initViz2(csvData, canvasContainer, tutorialBtn, backBtn, forwardBtn) {
             updateTimeDisplay();
             updateCountryList();
         });
+        
+        // Animation state
+        let animationInterval = null;
+        const animationSpeed = 500; // milliseconds per period
+        
+        // Animation function
+        function startAnimation() {
+            if (animationInterval) return; // Already playing
+            
+            const minIndex = 0;
+            const maxIndex = timePeriods.length - 1;
+            
+            animationInterval = setInterval(() => {
+                currentPeriodIndex++;
+                
+                if (currentPeriodIndex > maxIndex) {
+                    currentPeriodIndex = minIndex; // Loop back to start
+                }
+                
+                timeSlider.value = currentPeriodIndex;
+                updateTimeDisplay();
+                updateCountryList();
+            }, animationSpeed);
+            
+            const playPauseBtn = document.getElementById('viz2-play-pause-btn');
+            if (playPauseBtn) {
+                playPauseBtn.textContent = '⏸ Pause';
+                playPauseBtn.style.background = '#f44336';
+            }
+        }
+        
+        function stopAnimation() {
+            if (animationInterval) {
+                clearInterval(animationInterval);
+                animationInterval = null;
+                const playPauseBtn = document.getElementById('viz2-play-pause-btn');
+                if (playPauseBtn) {
+                    playPauseBtn.textContent = '▶ Play';
+                    playPauseBtn.style.background = '#4CAF50';
+                }
+            }
+        }
+        
+        // Play/pause button event listener
+        const playPauseBtn = document.getElementById('viz2-play-pause-btn');
+        if (playPauseBtn) {
+            playPauseBtn.addEventListener('click', function() {
+                if (animationInterval) {
+                    stopAnimation();
+                } else {
+                    startAnimation();
+                }
+            });
+        }
         
         document.getElementById('viz2-reset-btn').addEventListener('click', resetScale);
         document.getElementById('viz2-compare-g7-brics').addEventListener('click', () => {

@@ -1461,12 +1461,69 @@ function createViz4() {
             .attr('id', 'yearValue-viz')
             .text(years[0]);
         
+        const playPauseBtn = controls.append('button')
+            .attr('id', 'playPauseBtn-viz4')
+            .text('▶ Play')
+            .style('padding', '5px 15px')
+            .style('margin-left', '10px')
+            .style('border', '1px solid #ccc')
+            .style('border-radius', '4px')
+            .style('background-color', '#f0f0f0')
+            .style('cursor', 'pointer')
+            .style('font-size', '14px')
+            .style('font-weight', 'bold');
+        
         draw(years[0]);
         
         sliderInput.on('input', function() {
             const year = parseInt(this.value);
             yearDisplay.text(year);
             draw(year);
+        });
+        
+        // Animation state
+        let animationInterval = null;
+        const animationSpeed = 500; // milliseconds per year
+        
+        // Animation function
+        function startAnimation() {
+            if (animationInterval) return; // Already playing
+            
+            const minYear = years[0];
+            const maxYear = years[years.length - 1];
+            
+            animationInterval = setInterval(() => {
+                let currentYear = parseInt(sliderInput.node().value);
+                currentYear++;
+                
+                if (currentYear > maxYear) {
+                    currentYear = minYear; // Loop back to start
+                }
+                
+                sliderInput.attr('value', currentYear);
+                sliderInput.node().value = currentYear;
+                yearDisplay.text(currentYear);
+                draw(currentYear);
+            }, animationSpeed);
+            
+            playPauseBtn.text('⏸ Pause');
+        }
+        
+        function stopAnimation() {
+            if (animationInterval) {
+                clearInterval(animationInterval);
+                animationInterval = null;
+                playPauseBtn.text('▶ Play');
+            }
+        }
+        
+        // Play/pause button event listener
+        playPauseBtn.on('click', function() {
+            if (animationInterval) {
+                stopAnimation();
+            } else {
+                startAnimation();
+            }
         });
     });
 }
