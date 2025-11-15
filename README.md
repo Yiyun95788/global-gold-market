@@ -6,6 +6,9 @@ This project is the final project for the course CSC316: Data Visualization: Fou
 The Global Gold Market Project explores the drivers of the current gold market boom by creating various insightful visualizations. The project integrated multiple datasets from reliable sources, and together producing a compelling data story that not only showcases gold’s current record highs, but also explains why this moment is unusual in historical context.\
 Steps and decisions of this project are recorded in our [process book](https://docs.google.com/document/d/1_T0myRcBCHLo46875zb36hIC_gwhNh9MgXAIH36EucY/edit?usp=sharing).
 
+### Live Demo
+[Gold: The Great Power Shift](https://yiyun95788.github.io/global-gold-market/docs/index.html#balance)
+
 ## Submissions
 The repository contains:
 

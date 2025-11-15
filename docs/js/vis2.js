@@ -391,7 +391,17 @@ function createViz2() {
     
     // Legend
     let legend = document.createElement('div');
-    legend.style.cssText = 'position: absolute; bottom: 20px; right: 20px; background: white; padding: 15px; border: 2px solid #ddd; border-radius: 4px; z-index: 100; pointer-events: none;';
+    legend.style.cssText = `
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background: white;
+    padding: 15px;
+    border: 2px solid #ddd;
+    border-radius: 4px;
+    z-index: 100;
+    pointer-events: none;
+`;
     legend.innerHTML = `
         <div style="font-weight: bold; margin-bottom: 8px;">Alliances</div>
         <div style="display: flex; align-items: center; margin: 4px 0;">
@@ -755,7 +765,8 @@ function initViz2(csvData, canvasContainer, tutorialBtn, backBtn, forwardBtn) {
         let rightBlocks = [];
         
         // Scale positioning
-        const centerX = width / 2;
+        const BALANCE_OFFSET_X = -160;
+        const centerX = width / 2 + BALANCE_OFFSET_X;
         const baseY = height - 250;
         const cupWidth = 200;
         const cupHeight = 120;
