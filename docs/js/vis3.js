@@ -48,6 +48,17 @@ function createViz3() {
         .style('font-weight', 'bold')
         .style('min-width', '50px');
     
+    const playPauseBtn = yearControls.append('button')
+        .attr('id', 'playPauseBtn-viz3')
+        .text('▶ Play')
+        .style('padding', '5px 15px')
+        .style('border', '1px solid #ccc')
+        .style('border-radius', '4px')
+        .style('background-color', '#f0f0f0')
+        .style('cursor', 'pointer')
+        .style('font-size', '14px')
+        .style('font-weight', 'bold');
+    
     const dataTypeControls = controlsContainer.append('div')
         .style('display', 'flex')
         .style('align-items', 'center')
@@ -226,14 +237,43 @@ function createViz3() {
 
         const years = Array.from(availableYears).sort((a, b) => a - b);
         const prodYearsSorted = Array.from(productionYears).sort((a, b) => a - b);
+        
+        const minYearReserves = years[0];
+        const maxYearReserves = years[years.length - 1];
+        const minYearProduction = prodYearsSorted.length > 0 ? prodYearsSorted[0] : null;
+        const maxYearProduction = prodYearsSorted.length > 0 ? prodYearsSorted[prodYearsSorted.length - 1] : null;
+        const maxYear = Math.max(maxYearReserves, maxYearProduction || 0);
                 
         if (years.length === 0) {
             container.innerHTML = '<p>No valid gold reserves data found.</p>';
             return;
         }
         
-        yearSlider.attr('min', years[0]).attr('max', years[years.length - 1]).attr('value', years[0]).attr('step', 1);
-        yearDisplay.text(years[0]);
+        // Function to update slider min/max based on data type
+        function updateSliderRange(dataType, resetToMin = false) {
+            let minYear;
+            if (dataType === 'production' || dataType === 'both') {
+                minYear = minYearProduction || minYearReserves;
+            } else {
+                minYear = minYearReserves;
+            }
+            
+            const currentValue = parseInt(yearSlider.node().value || yearSlider.attr('value'));
+            yearSlider.attr('min', minYear).attr('max', maxYear).attr('step', 1);
+            
+            // If resetting to min (when switching categories) or current value is below new min, set it to min
+            if (resetToMin || currentValue < minYear) {
+                yearSlider.attr('value', minYear);
+                yearSlider.node().value = minYear; // Update DOM property for visual position
+                yearDisplay.text(minYear);
+                return minYear;
+            }
+            return currentValue;
+        }
+        
+        // Initialize slider for reserves (default)
+        const initialYear = updateSliderRange('reserves');
+        yearDisplay.text(initialYear);
 
         let selectedDataType = 'reserves';
 
@@ -442,13 +482,18 @@ function createViz3() {
                 // 2D bivariate legend (production vs reserves)
                 const bivariateLegend = legendContainer.append('div')
                     .style('position', 'relative')
-                    .style('padding', '20px 0 0 30px');
+                    .style('padding', '20px 0 0 0');
                 
                 const n = gridSize;
                 const cellSize = 14;
+                const leftMargin = 50; // Space for Y-axis scale
+                const bottomMargin = 50; // Space for X-axis scale
+                const topMargin = 20; // Space for title
+                const rightMargin = 20;
+                
                 const legendSvg = bivariateLegend.append('svg')
-                    .attr('width', n * cellSize + 60)
-                    .attr('height', n * cellSize + 60);
+                    .attr('width', n * cellSize + leftMargin + rightMargin)
+                    .attr('height', n * cellSize + topMargin + bottomMargin);
                 
                 // Draw grid
                 for (let i = 0; i < n; i++) {
@@ -456,8 +501,8 @@ function createViz3() {
                         const p = i / (n - 1); // x: production
                         const r = j / (n - 1); // y: reserves
                         legendSvg.append('rect')
-                            .attr('x', 30 + i * cellSize)
-                            .attr('y', (n - 1 - j) * cellSize)
+                            .attr('x', leftMargin + i * cellSize)
+                            .attr('y', topMargin + (n - 1 - j) * cellSize)
                             .attr('width', cellSize)
                             .attr('height', cellSize)
                             .attr('fill', bivariateColor(r, p))
@@ -467,66 +512,60 @@ function createViz3() {
                 
                 // Border around grid
                 legendSvg.append('rect')
-                    .attr('x', 29)
-                    .attr('y', -1)
+                    .attr('x', leftMargin - 1)
+                    .attr('y', topMargin - 1)
                     .attr('width', n * cellSize + 2)
                     .attr('height', n * cellSize + 2)
                     .attr('fill', 'none')
                     .attr('stroke', '#333')
                     .attr('stroke-width', 2);
                 
+                // Y-axis scale (Reserves - left side)
+                const reservesScale = d3.scaleLinear()
+                    .domain([reservesDomain[1], reservesDomain[0]]) // Reversed for top-to-bottom
+                    .range([0, n * cellSize]);
+                
+                const reservesAxis = d3.axisLeft(reservesScale)
+                    .ticks(5)
+                    .tickFormat(d3.format('.0f'));
+                
+                legendSvg.append('g')
+                    .attr('class', 'reserves-axis')
+                    .attr('transform', `translate(${leftMargin - 5}, ${topMargin})`)
+                    .call(reservesAxis);
+                
+                // X-axis scale (Production - bottom)
+                const productionScaleAxis = d3.scaleLinear()
+                    .domain([prodDomain[0], prodDomain[1]])
+                    .range([0, n * cellSize]);
+                
+                const productionAxis = d3.axisBottom(productionScaleAxis)
+                    .ticks(5)
+                    .tickFormat(d => d3.format('.1f')(d / 100));
+                
+                legendSvg.append('g')
+                    .attr('class', 'production-axis')
+                    .attr('transform', `translate(${leftMargin}, ${topMargin + n * cellSize + 5})`)
+                    .call(productionAxis);
+                
                 // Y-axis label (Reserves - vertical)
                 legendSvg.append('text')
                     .attr('x', 10)
-                    .attr('y', n * cellSize / 2)
+                    .attr('y', topMargin + n * cellSize / 2)
                     .attr('text-anchor', 'middle')
                     .attr('font-size', '11px')
                     .attr('font-weight', 'bold')
-                    .attr('transform', `rotate(-90, 10, ${n * cellSize / 2})`)
-                    .text('Reserves →');
+                    .attr('transform', `rotate(-90, 10, ${topMargin + n * cellSize / 2})`)
+                    .text('Reserves (tonnes)');
                 
                 // X-axis label (Production - horizontal)
                 legendSvg.append('text')
-                    .attr('x', 30 + n * cellSize / 2)
-                    .attr('y', n * cellSize + 15)
+                    .attr('x', leftMargin + n * cellSize / 2)
+                    .attr('y', topMargin + n * cellSize + bottomMargin - 5)
                     .attr('text-anchor', 'middle')
                     .attr('font-size', '11px')
                     .attr('font-weight', 'bold')
-                    .text('Production →');
-                
-                // Corner labels
-                legendSvg.append('text')
-                    .attr('x', 30)
-                    .attr('y', n * cellSize + 30)
-                    .attr('text-anchor', 'start')
-                    .attr('font-size', '10px')
-                    .attr('fill', '#666')
-                    .text('Low/Low');
-                
-                legendSvg.append('text')
-                    .attr('x', 30 + n * cellSize)
-                    .attr('y', n * cellSize + 30)
-                    .attr('text-anchor', 'end')
-                    .attr('font-size', '10px')
-                    .attr('fill', '#666')
-                    .text('High Prod');
-                
-                legendSvg.append('text')
-                    .attr('x', 30)
-                    .attr('y', -5)
-                    .attr('text-anchor', 'start')
-                    .attr('font-size', '10px')
-                    .attr('fill', '#666')
-                    .text('High Res');
-                
-                legendSvg.append('text')
-                    .attr('x', 30 + n * cellSize)
-                    .attr('y', -5)
-                    .attr('text-anchor', 'end')
-                    .attr('font-size', '10px')
-                    .attr('fill', '#006400')
-                    .attr('font-weight', 'bold')
-                    .text('High/High');
+                    .text('Production (100 tonnes)');
                 
             } else {
                 // 1D legend for single dataset
@@ -582,7 +621,7 @@ function createViz3() {
             }
         }
         
-        drawMap(years[0]);
+        drawMap(initialYear);
         
         // Add slider event listener
         yearSlider.on('input', function() {
@@ -594,7 +633,60 @@ function createViz3() {
         // Add data type selector event listener
         dataTypeSelect.on('change', function() {
             selectedDataType = this.value;
-            drawMap(parseInt(yearSlider.node().value));
+            // Reset slider to starting year when switching categories
+            const updatedYear = updateSliderRange(selectedDataType, true);
+            drawMap(updatedYear);
+            // Stop animation if running
+            if (animationInterval) {
+                clearInterval(animationInterval);
+                animationInterval = null;
+                playPauseBtn.text('▶ Play');
+            }
+        });
+        
+        // Animation state
+        let animationInterval = null;
+        const animationSpeed = 200; // milliseconds per year
+        
+        // Animation function
+        function startAnimation() {
+            if (animationInterval) return; // Already playing
+            
+            const minYear = parseInt(yearSlider.attr('min'));
+            const maxYear = parseInt(yearSlider.attr('max'));
+            
+            animationInterval = setInterval(() => {
+                let currentYear = parseInt(yearSlider.node().value);
+                currentYear++;
+                
+                if (currentYear > maxYear) {
+                    currentYear = minYear; // Loop back to start
+                }
+                
+                yearSlider.attr('value', currentYear);
+                yearSlider.node().value = currentYear;
+                yearDisplay.text(currentYear);
+                drawMap(currentYear);
+            }, animationSpeed);
+            
+            playPauseBtn.text('⏸ Pause');
+        }
+        
+        function stopAnimation() {
+            if (animationInterval) {
+                clearInterval(animationInterval);
+                animationInterval = null;
+                playPauseBtn.text('▶ Play');
+            }
+        }
+        
+        // Play/pause button event listener
+        playPauseBtn.on('click', function() {
+            if (animationInterval) {
+                stopAnimation();
+            } else {
+                startAnimation();
+            }
         });
     })
 }

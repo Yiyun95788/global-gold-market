@@ -271,10 +271,70 @@ function createViz4Paradox() {
         
         draw(years[0]);
         
+        // --- Slider event ---
         sliderInput.on('input', function() {
             const year = parseInt(this.value);
             yearDisplay.text(year);
             draw(year);
+
+            // If user moves the slider manually, stop animation
+            if (animationInterval) stopAnimation();
+        });
+
+        // --- Play/Pause Button ---
+        const playPauseBtn = controls.append('button')
+            .attr('id', 'playPauseBtn-paradox')
+            .text('▶ Play')
+            .style('padding', '5px 15px')
+            .style('margin-left', '10px')
+            .style('border', '1px solid #ccc')
+            .style('border-radius', '4px')
+            .style('background-color', '#f0f0f0')
+            .style('cursor', 'pointer')
+            .style('font-size', '14px')
+            .style('font-weight', 'bold');
+
+        // --- NEW: Animation State ---
+        let animationInterval = null;
+        const animationSpeed = 500; // ms per year
+
+        function startAnimation() {
+            if (animationInterval) return;
+
+            const minYear = years[0];
+            const maxYear = years[years.length - 1];
+
+            animationInterval = setInterval(() => {
+                let currentYear = parseInt(sliderInput.node().value);
+                currentYear++;
+
+                if (currentYear > maxYear) currentYear = minYear;
+
+                sliderInput.attr('value', currentYear);
+                sliderInput.node().value = currentYear;
+
+                yearDisplay.text(currentYear);
+                draw(currentYear);
+            }, animationSpeed);
+
+            playPauseBtn.text('⏸ Pause');
+        }
+
+        function stopAnimation() {
+            if (animationInterval) {
+                clearInterval(animationInterval);
+                animationInterval = null;
+                playPauseBtn.text('▶ Play');
+            }
+        }
+
+        // --- NEW: Button Event Listener ---
+        playPauseBtn.on('click', function() {
+            if (animationInterval) {
+                stopAnimation();
+            } else {
+                startAnimation();
+            }
         });
     });
 }
