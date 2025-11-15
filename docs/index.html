@@ -3,66 +3,115 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Global Gold Market Analysis</title>
+    <title>Gold: The Great Power Shift</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    
+    <!-- FullPage CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullPage.js/3.0.9/fullpage.css" />
+    
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-    <header>
-        <h1>Global Gold Market Analysis</h1>
-        <button id="storyBtn" class="story-btn">Story</button>
-    </header>
-    
-    <div id="storyOverlay" class="story-overlay">
-        <div class="story-content">
-            <button class="close-btn" onclick="closeStory()">&times;</button>
-            <h2 id="storyTitle"></h2>
-            <p id="storyText"></p>
-            <div class="story-nav">
-                <button onclick="prevParagraph()">&lt;</button>
-                <span id="pageIndicator"></span>
-                <button onclick="nextParagraph()">&gt;</button>
+    <div class="container-fluid">
+        <div id="fullpage">
+            
+            <!-- Page 1: Home -->
+            <div class="section" id="home-page">
             </div>
+            
+            <!-- Page 2: The Paradox - Correlation Heatmap -->
+            <div class="section" id="viz-paradox">
+                <div id="paradox-content"></div>
+            </div>
+            
+            <!-- Page 3: Historical Context - River Chart -->
+            <div class="section" id="viz-history">
+                <div id="history-content"></div>
+            </div>
+            
+            <!-- Page 4: Transition Page -->
+            <div class="section" id="transition-page">
+            </div>
+            
+            <!-- Page 5: Balance Text -->
+            <div class="section" id="balance-text-page">
+                <div id="balance-text-content"></div>
+            </div>
+            
+            <!-- Page 6: Balance Visualization -->
+            <div class="section scrollable" id="viz-balance">
+                <div id="balance-content"></div>
+            </div>
+            
+            <!-- Page 7: Map Text -->
+            <div class="section" id="map-text-page">
+                <div id="map-text-content"></div>
+            </div>
+            
+            <!-- Page 8: Map Visualization -->
+            <div class="section scrollable" id="viz-map">
+                <div id="map-content"></div>
+            </div>
+            
+            <!-- Page 9: Regime Text -->
+            <div class="section" id="regime-text-page">
+                <div id="regime-text-content"></div>
+            </div>
+            
+            <!-- Page 10: Regime Visualization -->
+            <div class="section scrollable" id="viz-regime">
+                <div id="regime-content"></div>
+            </div>
+            
+            <!-- Page 11: Conclusion -->
+            <div class="section" id="conclusion-page">
+            </div>
+            
         </div>
     </div>
     
-    <nav>
-        <button class="tab-btn active" onclick="showTab(1)">Visualization 1</button>
-        <button class="tab-btn" onclick="showTab(2)">Visualization 2</button>
-        <button class="tab-btn" onclick="showTab(3)">Visualization 3</button>
-        <button class="tab-btn" onclick="showTab(4)">Visualization 4</button>
-        <button class="tab-btn" onclick="showTab(5)">Visualization 5</button>
-    </nav>
-    
-    <div id="viz1" class="tab-content active">
-        <h2>Visualization 1</h2>
-        <div class="viz-container"></div>
-    </div>
-    
-    <div id="viz2" class="tab-content">
-        <h2>Visualization 2</h2>
-        <div class="viz-container"></div>
-    </div>
-    
-    <div id="viz3" class="tab-content">
-        <h2>Visualization 3</h2>
-        <div class="viz-container"></div>
-    </div>
-    
-    <div id="viz4" class="tab-content">
-        <div class="viz-container"></div>
-    </div>
-    
-    <div id="viz5" class="tab-content">
-        <h2>Visualization 5</h2>
-        <div class="viz-container"></div>
-    </div>
-    
+    <!-- Libraries -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
-    <script src="js/script.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullPage.js/3.0.9/fullpage.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="js/init.js"></script>
+    <script src="js/home.js"></script>
+    <script src="js/paradox.js"></script>
+    <script src="js/history.js"></script>
+    <script src="js/transition.js"></script>
     <script src="js/vis2.js"></script>
+    <script src="js/balance-text.js"></script>
+    <script src="js/balance.js"></script>
     <script src="js/vis3.js"></script>
+    <script src="js/map-text.js"></script>
+    <script src="js/map.js"></script>
+    <script src="js/script.js"></script>
+    <script src="js/regime-text.js"></script>
+    <script src="js/regime.js"></script>
+    <script src="js/conclusion.js"></script>
+    
+    <!-- Initialize FullPage -->
+    <script>
+        new fullpage('#fullpage', {
+            licenseKey: 'OPEN-SOURCE-GPLV3-LICENSE',
+            anchors: ['home', 'paradox', 'history', 'transition', 'balance-text', 'balance', 'map-text', 'map', 'regime-text', 'regime', 'conclusion'],
+            autoScrolling: true,
+            scrollingSpeed: 1000,
+            fitToSection: false,
+            navigation: true,
+            navigationPosition: 'right',
+            navigationTooltips: ['Home', 'The Paradox', 'Historical Context', 'Power Shift', 'Balance of Power', 'Balance Scale', 'Geographic Reality', 'Reserve Map', 'Market Regimes', 'Regime Quilt', 'Conclusion'],
+            onLeave: function(origin, destination){
+                destination.item.classList.add('load-background');
+            }
+        });
+    </script>
 </body>
 </html>
