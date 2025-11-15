@@ -62,7 +62,7 @@ const AnimationLibrary = {
         const updatePosition = () => {
             if (!element) return;
             const rect = element.getBoundingClientRect();
-            overlay.style.left = rect.left + rect.width / 2 - 125 + 'px';
+            overlay.style.left = rect.left + rect.width / 2 - 125 + 100 + 'px';
             if (arrowDirection === 'top') {
                 overlay.style.top = rect.top - 100 + 'px';
             } else {
@@ -306,6 +306,7 @@ function createViz2() {
     
     // Left panel for country selection
     let leftPanel = document.createElement('div');
+    leftPanel.id = 'viz2-left-panel';
     leftPanel.style.cssText = 'width: 250px; background: #f9f9f9; padding: 15px; overflow-y: auto; border-radius: 4px;';
     vizDiv.appendChild(leftPanel);
     
