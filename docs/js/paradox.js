@@ -147,14 +147,19 @@ function createViz4Paradox() {
             const g = svg.append('g')
                 .attr('transform', `translate(${margin.left}, ${margin.top})`);
             
-            svg.append('text')
-                .attr('x', width / 2)
-                .attr('y', 30)
-                .attr('text-anchor', 'middle')
-                .style('font-size', '18px')
-                .style('font-weight', '700')
-                .style('fill', '#1a1f3a')
-                .text(`Asset Correlations in ${selectedYear}`);
+            // Update or create title text element
+            let titleText = svg.select('.title-text');
+            if (titleText.empty()) {
+                titleText = svg.append('text')
+                    .attr('class', 'title-text')
+                    .attr('x', width / 2)
+                    .attr('y', 30)
+                    .attr('text-anchor', 'middle')
+                    .style('font-size', '18px')
+                    .style('font-weight', '700')
+                    .style('fill', '#1a1f3a');
+            }
+            titleText.text(`Asset Correlations in ${selectedYear}`);
             
             for (let i = 0; i < 5; i++) {
                 for (let j = 0; j < 5; j++) {
