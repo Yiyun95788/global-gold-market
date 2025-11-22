@@ -19,12 +19,67 @@ function createViz5() {
         .style('gap','16px')
         .style('align-items','start');
 
-    shell.append('div')
+    let insightsOn = false;
+
+    const header = shell.append('div')
         .style('grid-column','1 / -1')
-        .append('h3')
-        .style('margin','0 0 6px 0')
+        .style('display','flex')
+        .style('justify-content','space-between')
+        .style('align-items','center')
+        .style('margin-bottom','4px');
+
+    header.append('h3')
+        .style('margin','0')
         .style('font-weight','800')
         .text('Interactive Gold-Silver Regime Quilt');
+
+    const insightBtn = header.append('button')
+        .style('padding','12px 22px')
+        .style('font-size','18px')
+        .style('font-weight','600')
+        .style('border-radius','18px')
+        .style('border','2px solid #2563eb')
+        .style('background','#ffffff')
+        .style('color','#1f2937')
+        .style('cursor','pointer')
+        .style('box-shadow','0 4px 14px rgba(0,0,0,0.10)')
+        .style('transition','all 0.15s ease')
+        .html('🔮 Reveal Insights')
+        .on('mouseenter', function () {
+            d3.select(this)
+                .style('background','#eef2ff')
+                .style('transform','translateY(-1px)');
+        })
+        .on('mouseleave', function () {
+            d3.select(this)
+                .style('background','#ffffff')
+                .style('transform','translateY(0)');
+        });
+
+
+    d3.selectAll('.insight-toast').remove();
+    const insightToast = d3.select('body')
+        .append('div')
+        .attr('class','insight-toast')
+        .style('position','fixed')
+        .style('left','50%')
+        .style('bottom','80px')
+        .style('transform','translateX(-50%)')
+        .style('padding','20px 32px')
+        .style('background','#111827f0')
+        .style('color','#f9fafb')
+        .style('border-radius','24px')
+        .style('font-size','20px')
+        .style('font-weight','600')
+        .style('line-height','1.5')
+        .style('max-width','900px')
+        .style('text-align','center')
+        .style('box-shadow','0 18px 45px rgba(0,0,0,0.45)')
+        .style('opacity',0)
+        .style('pointer-events','none')
+        .style('transition','opacity 0.3s ease')
+        .style('z-index',10001);
+
 
     const margin = {top: 36, right: 10, bottom: 40, left: 50};
     const years = d3.range(2000, 2026);
@@ -53,6 +108,7 @@ function createViz5() {
         return 'High';
     }
 
+    // tooltip
     const tooltip = d3.select('body')
         .append('div')
         .attr('class','quilt-tip')
@@ -68,16 +124,41 @@ function createViz5() {
         .style('opacity',0)
         .style('z-index', '10000');
 
-    const svg = shell.append('div')
-        .style('position','relative')
+    // left SVG
+    const svgWrapper = shell.append('div')
+        .style('position','relative');
+
+    const svg = svgWrapper
         .append('svg')
         .attr('width', w)
         .attr('height', h);
 
-    const legend = shell.append('div')
+    // Soft glow filter for ++ clusters
+    const defs = svg.append('defs');
+    const glow = defs.append('filter')
+        .attr('id','softGlow')
+        .attr('x','-50%')
+        .attr('y','-50%')
+        .attr('width','200%')
+        .attr('height','200%');
+    glow.append('feGaussianBlur')
+        .attr('stdDeviation','3.5')
+        .attr('result','coloredBlur');
+    const feMerge = glow.append('feMerge');
+    feMerge.append('feMergeNode').attr('in','coloredBlur');
+    feMerge.append('feMergeNode').attr('in','SourceGraphic');
+
+    // sidebar：Legend + How to Read
+    const sidebar = shell.append('div')
         .style('position','sticky')
         .style('top','10px')
         .style('align-self','start')
+        .style('display','flex')
+        .style('flex-direction','column')
+        .style('gap','12px');
+
+    // Legend
+    const legend = sidebar.append('div')
         .style('background','#fff')
         .style('border','1px solid #e5e7eb')
         .style('border-radius','12px')
@@ -138,7 +219,38 @@ function createViz5() {
         row.append('div').text(`GPR: ${lab}`);
     });
 
+    // How to Read panel
+    const explainer = sidebar.append('div')
+        .style('background','#fff')
+        .style('border','1px solid #e5e7eb')
+        .style('border-radius','12px')
+        .style('padding','12px')
+        .style('box-shadow','0 6px 18px rgba(0,0,0,0.05)')
+        .style('font-size','12px')
+        .style('line-height','1.45');
+
+    explainer.append('div')
+        .style('font-weight','700')
+        .style('margin-bottom','8px')
+        .text('How to Read');
+
+    [
+        '• GPR = Geopolitical Risk Index.',
+        '  Higher = more geopolitical tension.',
+        '',
+        '• Gold/Silver % = monthly return:',
+        '  this month vs previous month,',
+        '  NOT year-over-year.',
+        '',
+        'Example:',
+        '  May Gold +0.03%',
+        '  = 0.03% higher than April.'
+    ].forEach(t => explainer.append('div').text(t));
+
+    const cellLayer = svg.append('g').attr('class','cells');
+
     const csvPath = 'data/Gold-Silver-GeopoliticalRisk_HistoricalData.csv';
+
     d3.csv(csvPath).then(raw => {
         const parse = d3.timeParse('%Y-%m-%d');
         const pick = (obj, keys) => {
@@ -222,9 +334,7 @@ function createViz5() {
             .style('font-weight','600')
             .text(d=>monthNames[d-1]);
 
-        const cells = svg.append('g').attr('class','cells');
-
-        cells.selectAll('rect.qcell')
+        const cells = cellLayer.selectAll('rect.qcell')
             .data(grid)
             .enter().append('rect')
             .attr('class','qcell')
@@ -252,6 +362,103 @@ function createViz5() {
             .on('mouseleave', ()=>{
                 tooltip.transition().duration(120).style('opacity',0);
             });
+
+// === Selections for different insight states ===
+        const plusPlusCells = cells.filter(d => d.regime === '++');   // green
+        const blueCells     = cells.filter(d => d.regime === '--');   // blue
+        const orangeCells   = cells.filter(d => d.regime === '+-');   // orange only
+        const highGprCells  = cells.filter(d => gprBucket(d.gpr) === 'High');
+
+        function resetInsightStyles() {
+            cells
+                .style('opacity', 1)
+                .style('filter', null)
+                .style('stroke-dasharray', null)
+                .style('stroke-width', d => gprStrokeWidth(d.gpr));
+        }
+
+        function dimAllCells() {
+            cells
+                .style('opacity', 0.18)
+                .style('filter', null)
+                .style('stroke-dasharray', null)
+                .style('stroke-width', d => gprStrokeWidth(d.gpr));
+        }
+
+        function highlightStep(stepIndex) {
+            dimAllCells();
+
+            // 0: Gold & Silver move together in most months (green & blue blocks).
+            if (stepIndex === 0) {
+                plusPlusCells
+                    .style('opacity', 1)
+                    .style('filter', 'url(#softGlow)');
+                blueCells
+                    .style('opacity', 1)
+                    .style('filter', 'url(#softGlow)');
+            }
+
+            // 1: Divergences are rarer and often Gold ↑, Silver ↓ (orange blocks).
+            if (stepIndex === 1) {
+                orangeCells
+                    .style('opacity', 1)
+                    .style('stroke-dasharray', '4 2')
+                    .style('filter', null);
+            }
+
+            // 2: High GPR (thick borders) tends to coincide with stronger Gold performance.
+            if (stepIndex === 2) {
+                highGprCells
+                    .style('opacity', 1)
+                    .style('stroke-width', d => gprStrokeWidth(d.gpr) + 2)
+                    .style('filter', null);
+            }
+        }
+
+// === Insight ===
+        const insightMessages = [
+            'Gold & Silver move together in most months (green & blue blocks).',
+            'Divergences are rarer and often Gold ↑, Silver ↓ (orange blocks).',
+            'High GPR (thick borders) tends to coincide with stronger Gold performance.'
+        ];
+
+        let msgIndex = 0;
+
+        function cycleMessages() {
+            if (!insightsOn) return;
+
+            // highlight according to insignts
+            highlightStep(msgIndex);
+
+            const text = insightMessages[msgIndex];
+            msgIndex = (msgIndex + 1) % insightMessages.length;
+
+            insightToast.interrupt()
+                .style('opacity', 0)
+                .text(text)
+                .transition().duration(200)
+                .style('opacity', 1)
+                .transition().delay(6600).duration(600)
+                .style('opacity', 0)
+                .on('end', () => {
+                    if (insightsOn) {
+                        setTimeout(cycleMessages, 600);
+                    }
+                });
+        }
+
+        insightBtn.on('click', () => {
+            insightsOn = !insightsOn;
+            if (insightsOn) {
+                insightBtn.text('✨ Hide Insights');
+                msgIndex = 0;
+                cycleMessages();
+            } else {
+                insightBtn.text('🔮 Reveal Insights');
+                resetInsightStyles();
+                insightToast.interrupt().style('opacity', 0);
+            }
+        });
 
         function formatPct(x){
             if (x==null || !isFinite(x)) return 'N/A';
