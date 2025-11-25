@@ -429,12 +429,14 @@ function createViz3() {
                         .attr('stroke-width', 2);
                     
                     const hasAny = (selectedDataType === 'production') ? !!pData : !!rData || (selectedDataType === 'both' && (!!rData || !!pData));
+                    
+                    // Always show tooltip with country name
+                    let tooltipHtml = `<div style="font-weight: bold; font-size: 16px; margin-bottom: 8px; color: #333;">${countryName}</div>`;
+                    
                     if (hasAny) {
-                        // Build HTML tooltip content
+                        // Build HTML tooltip content with data
                         const showReserves = selectedDataType !== 'production' && rData;
                         const showProduction = selectedDataType !== 'reserves' && pData;
-                        
-                        let tooltipHtml = `<div style="font-weight: bold; font-size: 16px; margin-bottom: 8px; color: #333;">${countryName}</div>`;
                         
                         if (showReserves) {
                             tooltipHtml += `<div style="margin-bottom: 4px;"><strong>Reserves:</strong> ${rData.tonnes.toLocaleString()} tonnes</div>`;
@@ -448,13 +450,16 @@ function createViz3() {
                                 tooltipHtml += `<div style="font-size: 12px; color: #666; font-style: italic;">(last known)</div>`;
                             }
                         }
-                        
-                        tooltip
-                            .style('display', 'block')
-                            .html(tooltipHtml)
-                            .style('left', (event.pageX + 15) + 'px')
-                            .style('top', (event.pageY - 10) + 'px');
+                    } else {
+                        // No data available
+                        tooltipHtml += `<div style="margin-bottom: 4px; color: #666;">No data</div>`;
                     }
+                    
+                    tooltip
+                        .style('display', 'block')
+                        .html(tooltipHtml)
+                        .style('left', (event.pageX + 15) + 'px')
+                        .style('top', (event.pageY - 10) + 'px');
                 })
                 .on('mousemove', function(event) {
                     tooltip
