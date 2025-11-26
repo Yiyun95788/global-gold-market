@@ -1,5 +1,5 @@
-/* ==================== GLOBAL STYLES ==================== */
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lato:wght@300;400;700&display=swap');
+/* ==================== VINTAGE NEWSPAPER THEME ==================== */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Merriweather:wght@300;400;700&family=EB+Garamond:wght@400;600;700&display=swap');
 
 * {
     margin: 0;
@@ -8,163 +8,319 @@
 }
 
 body {
-    font-family: 'Lato', sans-serif;
-    color: #2c3e50;
-    background: #FAF9F6;
+    font-family: 'Merriweather', serif;
+    color: #2c2416;
+    background: #f4e8d0;
     overflow-x: hidden;
+    line-height: 1.7;
 }
 
 h1, h2, h3, h4, h5, h6 {
-    font-family: 'Cinzel', serif;
-    color: #1a1f3a;
+    font-family: 'Playfair Display', serif;
+    color: #1a1410;
+    font-weight: 900;
+    letter-spacing: -0.5px;
 }
 
 /* ==================== FULLPAGE SECTIONS ==================== */
 .section {
+    background: #f4e8d0;
+    position: relative;
+    min-height: 100vh;
+    padding: 0;
+}
+
+/* Newspaper texture backgrounds */
+#viz-paradox::before,
+#viz-history::before,
+#balance-text-page::before,
+#viz-balance::before,
+#map-text-page::before,
+#viz-map::before,
+#regime-text-page::before,
+#viz-regime::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url('../images/textures/newspaper-bg-2.jpg');
     background-size: cover;
     background-position: center;
-    background-repeat: no-repeat;
+    background-attachment: fixed;
+    opacity: 0.15;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Alternate textures for variety */
+#viz-balance::before,
+#regime-text-page::before {
+    background-image: url('../images/textures/newspaper-bg-3.jpg');
+}
+
+#map-text-page::before,
+#viz-history::before {
+    background-image: url('../images/textures/newspaper-bg-1.jpg');
+    opacity: 0.12;
+}
+
+/* Ensure content stays above texture */
+.section > div,
+.section > article {
+    position: relative;
+    z-index: 1;
+}
+
+.section::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 10%;
+    right: 10%;
+    height: 1px;
+    background: linear-gradient(to right, transparent, #8b7355, transparent);
+    z-index: 2;
+}
+
+/* ==================== NEWSPAPER MASTHEAD ==================== */
+.newspaper-masthead {
+    text-align: center;
+    padding: 40px 20px 30px;
+    border-bottom: 4px double #2c2416;
+    border-top: 2px solid #2c2416;
+    background: #f4e8d0;
     position: relative;
 }
 
-.section.fp-auto-height {
-    height: auto !important;
+.newspaper-masthead::before,
+.newspaper-masthead::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    height: 1px;
+    background: #2c2416;
 }
 
-.section.scrollable {
-    overflow-y: auto;
-    height: 100vh;
+.newspaper-masthead::before {
+    top: 5px;
 }
 
-/* Gold texture overlay for all sections */
-.section::before {
+.newspaper-masthead::after {
+    bottom: 5px;
+}
+
+.masthead-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 4rem;
+    font-weight: 900;
+    letter-spacing: 2px;
+    color: #1a1410;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 0px rgba(212, 175, 55, 0.3);
+}
+
+.masthead-subtitle {
+    font-family: 'EB Garamond', serif;
+    font-size: 1.2rem;
+    font-style: italic;
+    color: #5c4a3a;
+    letter-spacing: 3px;
+}
+
+.masthead-date {
+    font-family: 'Merriweather', serif;
+    font-size: 0.9rem;
+    color: #6b5b4a;
+    margin-top: 15px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* ==================== NEWSPAPER COLUMNS ==================== */
+.newspaper-columns {
+    column-count: 2;
+    column-gap: 40px;
+    column-rule: 1px solid #d4c4a8;
+    padding: 40px 80px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.newspaper-columns h2 {
+    column-span: all;
+    font-size: 2.5rem;
+    text-align: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 3px double #2c2416;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.newspaper-columns p:first-of-type::first-letter {
+    float: left;
+    font-size: 5rem;
+    line-height: 0.8;
+    font-weight: 700;
+    margin: 5px 10px 0 0;
+    font-family: 'Playfair Display', serif;
+    color: #8b7355;
+}
+
+/* ==================== ORNAMENTAL DIVIDERS ==================== */
+.ornamental-divider {
+    text-align: center;
+    margin: 30px 0;
+    position: relative;
+    color: #8b7355;
+}
+
+.ornamental-divider::before {
+    content: '◆ ◆ ◆';
+    font-size: 0.8rem;
+}
+
+/* ==================== ARTICLE HEADLINES ==================== */
+.article-headline {
+    font-family: 'Playfair Display', serif;
+    font-size: 3rem;
+    font-weight: 900;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    line-height: 1.1;
+    margin: 40px 0 20px;
+    color: #1a1410;
+    border-top: 2px solid #2c2416;
+    border-bottom: 2px solid #2c2416;
+    padding: 20px 0;
+}
+
+.article-subheadline {
+    font-family: 'EB Garamond', serif;
+    font-size: 1.5rem;
+    font-style: italic;
+    text-align: center;
+    color: #5c4a3a;
+    margin-bottom: 30px;
+}
+
+/* ==================== PULL QUOTES ==================== */
+.pull-quote {
+    border-left: 4px solid #D4AF37;
+    border-right: 4px solid #D4AF37;
+    padding: 25px 30px;
+    margin: 30px 0;
+    background: rgba(139, 115, 85, 0.05);
+    font-family: 'EB Garamond', serif;
+    font-size: 1.3rem;
+    font-style: italic;
+    color: #3a2f24;
+    position: relative;
+}
+
+.pull-quote::before {
+    content: '"';
+    position: absolute;
+    top: -10px;
+    left: 10px;
+    font-size: 4rem;
+    color: #D4AF37;
+    font-family: 'Playfair Display', serif;
+}
+
+/* ==================== VISUALIZATION FRAMES ==================== */
+.viz-frame {
+    background: #faf8f3;
+    border: 3px double #8b7355;
+    padding: 30px;
+    margin: 40px 0;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    position: relative;
+}
+
+.viz-frame::before,
+.viz-frame::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #8b7355;
+}
+
+.viz-frame::before {
+    top: 10px;
+    left: 10px;
+    border-right: none;
+    border-bottom: none;
+}
+
+.viz-frame::after {
+    top: 10px;
+    right: 10px;
+    border-left: none;
+    border-bottom: none;
+}
+
+.viz-frame-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #8b7355;
+    color: #2c2416;
+}
+
+/* ==================== SECTION LAYOUTS ==================== */
+#home-page {
+    background: linear-gradient(180deg, #2c2416 0%, #3a2f24 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+#home-page::before {
     content: '';
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg, rgba(212, 175, 55, 0.03) 0%, rgba(255, 215, 0, 0.05) 100%);
-    pointer-events: none;
+    background-image: radial-gradient(circle, rgba(212, 175, 55, 0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
     z-index: 0;
 }
 
-.section > div {
-    position: relative;
-    z-index: 1;
+/* Text sections with columns */
+.text-section-columns {
+    column-count: 2;
+    column-gap: 50px;
+    column-rule: 1px solid #d4c4a8;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 60px 80px;
 }
 
-/* ==================== COLOR PALETTE ==================== */
-:root {
-    --gold-primary: #D4AF37;
-    --gold-light: #FFD700;
-    --gold-dark: #B8860B;
-    --bronze: #CD7F32;
-    --navy: #1a1f3a;
-    --navy-light: #2c3e50;
-    --cream: #FAF9F6;
-    --white: #FFFFFF;
-}
-
-/* ==================== HOME PAGE ==================== */
-#home-page {
-    background: linear-gradient(135deg, #1a1f3a 0%, #2c3e50 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* ==================== VISUALIZATION PAGES LAYOUT ==================== */
-.viz-page-container {
-    width: 100%;
+/* Full-width visualization sections */
+.viz-section-full {
     max-width: 1600px;
     margin: 0 auto;
-    padding: 40px;
-    display: grid;
-    grid-template-columns: 400px 1fr;
-    gap: 40px;
-    align-items: start;
-    min-height: 100vh;
+    padding: 60px 40px;
 }
 
-/* Stacked layout for complex full-width visualizations */
-.viz-page-container.stacked {
-    display: flex;
-    flex-direction: column;
-    gap: 30px;
-    padding: 60px 80px;
-    max-width: 1900px;
-}
-
-.viz-page-container.stacked .viz-text-section {
-    position: relative;
-    top: 0;
-    max-width: 1000px;
-    padding: 0;
-}
-
-.viz-page-container.stacked .viz-visual-section {
-    width: 100%;
-    padding: 40px;
-    min-height: 700px;
-}
-
-.viz-text-section {
-    padding: 20px;
-    position: sticky;
-    top: 40px;
-}
-
-.viz-text-section h2 {
-    font-size: 2.2rem;
-    color: var(--gold-primary);
-    margin-bottom: 20px;
-    font-weight: 700;
-}
-
-.viz-text-section .subtitle {
-    font-size: 1.2rem;
-    color: var(--navy-light);
-    margin-bottom: 20px;
-    font-weight: 300;
-}
-
-.viz-text-section p {
-    font-size: 1rem;
-    line-height: 1.7;
-    color: var(--navy-light);
-    margin-bottom: 15px;
-}
-
-.viz-text-section .highlight-box {
-    background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(255, 215, 0, 0.15) 100%);
-    border-left: 4px solid var(--gold-primary);
-    padding: 15px;
-    margin: 20px 0;
-    border-radius: 4px;
-}
-
-.viz-visual-section {
-    padding: 20px;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    overflow: visible;
-}
-
-/* ==================== TRANSITION PAGE ==================== */
+/* ==================== TRANSITION PAGE STYLING ==================== */
 #transition-page {
-    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* ==================== TEXT-ONLY PAGES ==================== */
-#balance-text-page,
-#map-text-page,
-#regime-text-page {
-    background: linear-gradient(135deg, #FAF9F6 0%, #F5F3EF 100%);
+    background: linear-gradient(180deg, #3a2f24 0%, #2c2416 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -172,42 +328,26 @@ h1, h2, h3, h4, h5, h6 {
 
 /* ==================== CONCLUSION PAGE ==================== */
 #conclusion-page {
-    background: linear-gradient(135deg, #2c3e50 0%, #1a1f3a 100%);
-}
-
-/* ==================== DECORATIVE ELEMENTS ==================== */
-.gold-accent {
-    color: var(--gold-primary);
-    font-weight: 700;
-}
-
-.gold-underline {
-    border-bottom: 3px solid var(--gold-primary);
-    padding-bottom: 5px;
-    display: inline-block;
-}
-
-.gold-divider {
-    width: 80px;
-    height: 3px;
-    background: linear-gradient(90deg, var(--gold-primary) 0%, var(--gold-light) 100%);
-    margin: 20px 0;
+    background: linear-gradient(180deg, #2c2416 0%, #1a1410 100%);
 }
 
 /* ==================== NAVIGATION DOTS ==================== */
 #fp-nav ul li a span {
-    background: var(--gold-primary);
+    background: #8b7355;
+    border: 2px solid #5c4a3a;
 }
 
 #fp-nav ul li a.active span,
 #fp-nav ul li:hover a.active span {
-    background: var(--gold-light);
-    box-shadow: 0 0 10px var(--gold-light);
+    background: #D4AF37;
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
 }
 
 #fp-nav ul li .fp-tooltip {
-    color: var(--navy);
-    font-family: 'Lato', sans-serif;
+    color: #2c2416;
+    font-family: 'Merriweather', serif;
+    background: #f4e8d0;
+    border: 1px solid #8b7355;
 }
 
 /* ==================== ANIMATIONS ==================== */
@@ -222,15 +362,25 @@ h1, h2, h3, h4, h5, h6 {
     }
 }
 
-@keyframes goldShimmer {
-    0% {
-        background-position: 0% 50%;
+@keyframes slideInFromLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-50px);
     }
-    50% {
-        background-position: 100% 50%;
+    to {
+        opacity: 1;
+        transform: translateX(0);
     }
-    100% {
-        background-position: 0% 50%;
+}
+
+@keyframes slideInFromRight {
+    from {
+        opacity: 0;
+        transform: translateX(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
     }
 }
 
@@ -238,113 +388,92 @@ h1, h2, h3, h4, h5, h6 {
     animation: fadeInUp 0.8s ease-out;
 }
 
-/* ==================== BUTTONS ==================== */
-.gold-button {
-    background: linear-gradient(135deg, var(--gold-primary) 0%, var(--gold-light) 100%);
-    color: var(--navy);
-    border: none;
-    padding: 12px 30px;
-    font-size: 16px;
-    font-weight: 700;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    font-family: 'Lato', sans-serif;
+.slide-in-left {
+    animation: slideInFromLeft 0.8s ease-out;
 }
 
-.gold-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+.slide-in-right {
+    animation: slideInFromRight 0.8s ease-out;
 }
 
-/* ==================== TOOLTIP ==================== */
-.tooltip {
-    position: absolute;
-    background: var(--navy);
-    color: white;
-    padding: 10px 15px;
-    border-radius: 6px;
-    pointer-events: none;
-    font-size: 14px;
-    z-index: 1000;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    border: 1px solid var(--gold-primary);
+/* ==================== SCROLL REVEAL ==================== */
+.scroll-reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
 }
 
-/* ==================== VIZ-SPECIFIC STYLES ==================== */
-
-/* Heatmap styles */
-.heatmap-cell {
-    stroke: #ffffff;
-    stroke-width: 2px;
-    transition: opacity 0.2s ease;
-    cursor: pointer;
-}
-
-.heatmap-cell:hover {
-    opacity: 0.7;
-}
-
-/* Map styles */
-.country {
-    stroke: #333;
-    stroke-width: 0.5;
-    transition: stroke 0.2s ease, stroke-width 0.2s ease;
-}
-
-.country:hover {
-    stroke: #000;
-    stroke-width: 2;
-}
-
-/* Balance scale styles */
-.gold-bar-draggable {
-    transition: transform 0.2s ease;
-}
-
-.gold-bar-draggable:hover {
-    transform: scale(1.05);
+.scroll-reveal.revealed {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 /* ==================== RESPONSIVE ==================== */
 @media (max-width: 1200px) {
-    .viz-page-container {
-        grid-template-columns: 1fr;
-        gap: 40px;
+    .newspaper-columns {
+        column-count: 1;
+        padding: 40px 60px;
     }
     
-    .viz-page-container.stacked {
-        padding: 30px 40px;
+    .text-section-columns {
+        column-count: 1;
+        padding: 40px 60px;
     }
     
-    .viz-text-section h2 {
-        font-size: 2rem;
+    .masthead-title {
+        font-size: 3rem;
     }
 }
 
 @media (max-width: 768px) {
-    .viz-page-container {
+    .newspaper-columns {
+        padding: 30px 40px;
+    }
+    
+    .text-section-columns {
+        padding: 30px 40px;
+    }
+    
+    .article-headline {
+        font-size: 2rem;
+    }
+    
+    .masthead-title {
+        font-size: 2.5rem;
+    }
+    
+    .viz-frame {
         padding: 20px;
     }
-    
-    .viz-page-container.stacked {
-        padding: 20px;
-    }
-    
-    .viz-text-section h2 {
-        font-size: 1.75rem;
-    }
-    
-    .viz-text-section p {
-        font-size: 1rem;
-    }
-    
-    .viz-visual-section {
-        padding: 15px;
-    }
-    
-    .viz-page-container.stacked .viz-visual-section {
-        padding: 20px;
-        min-height: 400px;
-    }
+}
+
+/* ==================== DETAILS ==================== */
+.dateline {
+    font-family: 'Merriweather', serif;
+    font-size: 0.85rem;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #8b7355;
+    font-weight: 700;
+    margin-bottom: 15px;
+}
+
+.byline {
+    font-family: 'EB Garamond', serif;
+    font-size: 0.95rem;
+    font-style: italic;
+    color: #5c4a3a;
+    margin-bottom: 20px;
+}
+
+.flourish {
+    text-align: center;
+    color: #8b7355;
+    font-size: 1.5rem;
+    margin: 20px 0;
+}
+
+.gold-accent {
+    color: #D4AF37;
 }

@@ -2,50 +2,112 @@
 (function() {
     const container = d3.select("#paradox-content");
     
-    // Create two-column layout
-    const pageContainer = container.append("div")
-        .attr("class", "viz-page-container");
+    container.html('');
     
-    // Left: Text section
-    const textSection = pageContainer.append("div")
-        .attr("class", "viz-text-section fade-in-up");
+    // Create fullpage article wrapper
+    const article = container.append("div")
+        .style("min-height", "100vh")
+        .style("background", "rgba(244, 232, 208, 0.75)")
+        .style("padding", "80px 0");
     
-    textSection.append("h2")
-        .html("The Gold <span class='gold-accent'>Paradox</span>");
+    // Inner content wrapper
+    const innerContent = article.append("div")
+        .style("max-width", "1400px")
+        .style("margin", "0 auto")
+        .style("padding", "0 80px");
     
-    textSection.append("div")
-        .attr("class", "gold-divider");
+    // Headline
+    innerContent.append("h2")
+        .attr("class", "article-headline scroll-reveal")
+        .style("border-top", "2px solid #2c2416")
+        .style("border-bottom", "2px solid #2c2416")
+        .style("padding", "20px 0")
+        .style("margin", "0 0 20px 0")
+        .text("THE GOLD PARADOX");
+    
+    // Subheadline
+    innerContent.append("div")
+        .attr("class", "article-subheadline scroll-reveal")
+        .text("When Safe Havens and Risk Assets Rise Together");
+    
+    // Dateline
+    innerContent.append("div")
+        .attr("class", "dateline scroll-reveal")
+        .style("margin-bottom", "30px")
+        .text("FINANCIAL MARKETS ANALYSIS");
+    
+    // Ornamental divider
+    innerContent.append("div")
+        .attr("class", "ornamental-divider");
+    
+    // Text section (single column)
+    const textSection = innerContent.append("div")
+        .attr("class", "scroll-reveal")
+        .style("max-width", "900px")
+        .style("margin", "40px auto");
     
     textSection.append("p")
-        .attr("class", "subtitle")
-        .text("Something unprecedented is happening");
+        .style("text-align", "justify")
+        .style("font-family", "Merriweather, serif")
+        .style("font-size", "1.1rem")
+        .style("line-height", "1.8")
+        .style("margin-bottom", "20px")
+        .html("<span style='float: left; font-size: 4rem; line-height: 0.8; font-weight: 700; margin: 5px 10px 0 0; font-family: Playfair Display, serif; color: #8b7355;'>F</span>or generations, the rule was simple: when stocks fell, gold rose. When markets rallied, gold declined. This inverse relationship formed the foundation of portfolio diversification.");
     
     textSection.append("p")
-        .html("For decades, gold and stocks moved in <strong>opposite directions</strong>. When markets crashed, investors fled to gold. When stocks rallied, gold languished.");
+        .style("text-align", "justify")
+        .style("font-family", "Merriweather, serif")
+        .style("font-size", "1.1rem")
+        .style("line-height", "1.8")
+        .style("margin-bottom", "30px")
+        .html("Today breaks that pattern. Gold and equities are surging together—a rare signal that traditional safe-haven narratives no longer fully explain market behavior.");
     
-    textSection.append("div")
-        .attr("class", "highlight-box")
-        .html("<strong>Today is different.</strong> Both gold AND equities are surging simultaneously—a rare phenomenon that signals fundamental shifts in global markets.");
+    // Pull quote
+    const pullQuote = innerContent.append("div")
+        .attr("class", "pull-quote scroll-reveal")
+        .style("max-width", "700px")
+        .style("margin", "40px auto");
     
-    textSection.append("p")
-        .text("Use the slider below to explore how gold's relationship with other assets has evolved from 2010 to 2025. Watch the correlations shift as we approach the present day.");
+    pullQuote.append("p")
+        .style("margin", "0")
+        .text("The simultaneous rise of gold and stocks suggests deeper structural changes in how the world values and stores wealth.");
     
-    // Right: Visualization section
-    const vizSection = pageContainer.append("div")
-        .attr("class", "viz-visual-section");
+    // Instruction text
+    innerContent.append("p")
+        .style("text-align", "center")
+        .style("font-family", "EB Garamond, serif")
+        .style("font-size", "1rem")
+        .style("line-height", "1.6")
+        .style("margin", "40px auto 30px")
+        .style("max-width", "700px")
+        .style("color", "#5c4a3a")
+        .style("font-style", "italic")
+        .html("Explore how gold's relationship with other assets has evolved from 2010 to 2025.");
     
-    vizSection.append("div")
+    // Visualization frame
+    const vizFrame = innerContent.append("div")
+        .attr("class", "viz-frame scroll-reveal")
+        .style("margin-top", "50px")
+        .style("margin-bottom", "80px");
+    
+    vizFrame.append("div")
+        .attr("class", "viz-frame-title")
+        .text("Asset Correlation Matrix");
+    
+    vizFrame.append("div")
         .attr("id", "heatmap-viz")
         .style("width", "100%")
-        .style("min-height", "500px");
+        .style("min-height", "600px")
+        .style("display", "flex")
+        .style("justify-content", "center")
+        .style("align-items", "center")
+        .style("padding", "20px 0");
     
-    // Call the existing createViz4 function (correlation heatmap)
-    // We'll adapt it to work in this container
-    createViz4Paradox();
+    // Call visualization function
+    setTimeout(() => createViz4Paradox(), 100);
     
 })();
 
-// Adapted version of createViz4 for this page layout
 function createViz4Paradox() {
     const container = document.querySelector('#heatmap-viz');
     const assets = ['Gold', 'BTC', 'USD', 'Silver', 'S&P 500'];
@@ -132,12 +194,21 @@ function createViz4Paradox() {
         
         const tooltip = d3.select('body')
             .append('div')
-            .attr('class', 'tooltip')
-            .style('opacity', 0);
+            .style('position', 'absolute')
+            .style('background', '#faf8f3')
+            .style('border', '2px solid #2c2416')
+            .style('padding', '10px 15px')
+            .style('border-radius', '0')
+            .style('pointer-events', 'none')
+            .style('font-family', 'Merriweather, serif')
+            .style('font-size', '12px')
+            .style('opacity', 0)
+            .style('z-index', '10000')
+            .style('box-shadow', '0 2px 8px rgba(0,0,0,0.2)');
         
         const colorScale = d3.scaleLinear()
             .domain([-1, 0, 1])
-            .range(['#ef4444', '#ffffff', '#3b82f6']);
+            .range(['#8b4513', '#f4e8d0', '#2c5f2d']);
         
         function draw(selectedYear) {
             const data = correlationData[selectedYear];
@@ -147,7 +218,6 @@ function createViz4Paradox() {
             const g = svg.append('g')
                 .attr('transform', `translate(${margin.left}, ${margin.top})`);
             
-            // Update or create title text element
             let titleText = svg.select('.title-text');
             if (titleText.empty()) {
                 titleText = svg.append('text')
@@ -155,11 +225,12 @@ function createViz4Paradox() {
                     .attr('x', width / 2)
                     .attr('y', 30)
                     .attr('text-anchor', 'middle')
+                    .style('font-family', 'Playfair Display, serif')
                     .style('font-size', '18px')
                     .style('font-weight', '700')
-                    .style('fill', '#1a1f3a');
+                    .style('fill', '#1a1410');
             }
-            titleText.text(`Asset Correlations in ${selectedYear}`);
+            titleText.text(`Asset Correlations ${selectedYear}`);
             
             for (let i = 0; i < 5; i++) {
                 for (let j = 0; j < 5; j++) {
@@ -171,6 +242,8 @@ function createViz4Paradox() {
                         .attr('width', cellSize)
                         .attr('height', cellSize)
                         .attr('fill', colorScale(value))
+                        .attr('stroke', '#2c2416')
+                        .attr('stroke-width', 1)
                         .on('mouseover', function(event) {
                             d3.select(this).style('opacity', 0.8);
                             tooltip.transition().duration(200).style('opacity', 1);
@@ -188,8 +261,10 @@ function createViz4Paradox() {
                         .attr('x', j * cellSize + cellSize / 2)
                         .attr('y', i * cellSize + cellSize / 2 + 5)
                         .attr('text-anchor', 'middle')
+                        .style('font-family', 'Merriweather, serif')
                         .style('font-weight', 'bold')
                         .style('font-size', '13px')
+                        .style('fill', '#1a1410')
                         .text(value.toFixed(2));
                 }
             }
@@ -200,14 +275,18 @@ function createViz4Paradox() {
                     .attr('x', -10)
                     .attr('y', i * cellSize + cellSize / 2 + 5)
                     .attr('text-anchor', 'end')
+                    .style('font-family', 'Merriweather, serif')
                     .style('font-size', '13px')
+                    .style('fill', '#2c2416')
                     .text(asset);
                 g.append('text')
                     .attr('class', 'heatmap-label')
                     .attr('x', i * cellSize + cellSize / 2)
                     .attr('y', -10)
                     .attr('text-anchor', 'middle')
+                    .style('font-family', 'Merriweather, serif')
                     .style('font-size', '13px')
+                    .style('fill', '#2c2416')
                     .text(asset);
             });
             
@@ -224,38 +303,47 @@ function createViz4Paradox() {
                 .attr('y2', '0%');
             gradient.append('stop')
                 .attr('offset', '0%')
-                .attr('stop-color', '#ef4444');
+                .attr('stop-color', '#8b4513');
             gradient.append('stop')
                 .attr('offset', '50%')
-                .attr('stop-color', '#ffffff');
+                .attr('stop-color', '#f4e8d0');
             gradient.append('stop')
                 .attr('offset', '100%')
-                .attr('stop-color', '#3b82f6');
+                .attr('stop-color', '#2c5f2d');
             
             svg.append('rect')
                 .attr('x', legendX)
                 .attr('y', legendY)
                 .attr('width', legendWidth)
                 .attr('height', legendHeight)
-                .attr('rx', 4)
                 .style('fill', 'url(#legend-gradient-paradox)')
-                .style('stroke', '#e5e7eb')
+                .style('stroke', '#2c2416')
                 .style('stroke-width', 1);
             
             svg.append('g')
                 .attr('transform', `translate(${legendX + legendWidth}, ${legendY})`)
-                .call(d3.axisRight(d3.scaleLinear().domain([1, -1]).range([0, legendHeight])).ticks(5).tickFormat(d => d.toFixed(1)));
+                .call(d3.axisRight(d3.scaleLinear().domain([1, -1]).range([0, legendHeight]))
+                    .ticks(5)
+                    .tickFormat(d => d.toFixed(1)))
+                .style('font-family', 'Merriweather, serif')
+                .style('font-size', '11px');
         }
         
         const controls = vizWrapper.append('div')
             .style('display', 'flex')
             .style('align-items', 'center')
             .style('gap', '15px')
-            .style('margin-top', '20px');
+            .style('margin-top', '20px')
+            .style('padding', '15px')
+            .style('background', '#faf8f3')
+            .style('border', '2px solid #8b7355')
+            .style('border-radius', '0');
         
         controls.append('label')
             .attr('for', 'yearSlider-paradox')
+            .style('font-family', 'Merriweather, serif')
             .style('font-weight', 'bold')
+            .style('color', '#2c2416')
             .text('Year:');
         
         const sliderInput = controls.append('input')
@@ -269,71 +357,62 @@ function createViz4Paradox() {
         
         const yearDisplay = controls.append('span')
             .attr('id', 'yearValue-paradox')
+            .style('font-family', 'Playfair Display, serif')
             .style('font-weight', 'bold')
             .style('font-size', '18px')
-            .style('color', '#D4AF37')
+            .style('color', '#8b7355')
             .text(years[0]);
         
         draw(years[0]);
         
-        // --- Slider event ---
         sliderInput.on('input', function() {
             const year = parseInt(this.value);
             yearDisplay.text(year);
             draw(year);
-
-            // If user moves the slider manually, stop animation
             if (animationInterval) stopAnimation();
         });
 
-        // --- Play/Pause Button ---
         const playPauseBtn = controls.append('button')
             .attr('id', 'playPauseBtn-paradox')
-            .text('▶ Play')
-            .style('padding', '5px 15px')
+            .text('Play')
+            .style('padding', '8px 20px')
             .style('margin-left', '10px')
-            .style('border', '1px solid #ccc')
-            .style('border-radius', '4px')
-            .style('background-color', '#f0f0f0')
+            .style('border', '2px solid #2c2416')
+            .style('background', '#f4e8d0')
             .style('cursor', 'pointer')
+            .style('font-family', 'Merriweather, serif')
             .style('font-size', '14px')
-            .style('font-weight', 'bold');
+            .style('font-weight', 'bold')
+            .style('color', '#2c2416')
+            .style('transition', 'all 0.2s');
 
-        // --- NEW: Animation State ---
         let animationInterval = null;
-        const animationSpeed = 500; // ms per year
+        const animationSpeed = 500;
 
         function startAnimation() {
             if (animationInterval) return;
-
             const minYear = years[0];
             const maxYear = years[years.length - 1];
-
             animationInterval = setInterval(() => {
                 let currentYear = parseInt(sliderInput.node().value);
                 currentYear++;
-
                 if (currentYear > maxYear) currentYear = minYear;
-
                 sliderInput.attr('value', currentYear);
                 sliderInput.node().value = currentYear;
-
                 yearDisplay.text(currentYear);
                 draw(currentYear);
             }, animationSpeed);
-
-            playPauseBtn.text('⏸ Pause');
+            playPauseBtn.text('Pause');
         }
 
         function stopAnimation() {
             if (animationInterval) {
                 clearInterval(animationInterval);
                 animationInterval = null;
-                playPauseBtn.text('▶ Play');
+                playPauseBtn.text('Play');
             }
         }
 
-        // --- NEW: Button Event Listener ---
         playPauseBtn.on('click', function() {
             if (animationInterval) {
                 stopAnimation();

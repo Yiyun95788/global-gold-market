@@ -1,28 +1,46 @@
 // Page 10: Regime Visualization Only
 (function() {
     const container = d3.select("#regime-content");
+    container.html('');
     
-    const vizContainer = container.append("div")
-        .style("width", "100%")
+    // Create newspaper-styled article wrapper
+    const article = container.append("div")
+        .style("min-height", "100vh")
+        .style("background", "transparent")
+        .style("padding", "60px 0");
+    
+    const innerContent = article.append("div")
         .style("max-width", "1900px")
         .style("margin", "0 auto")
+        .style("padding", "0 60px");
+    
+    // Visualization frame with newspaper styling
+    const vizFrame = innerContent.append("div")
+        .attr("class", "viz-frame scroll-reveal")
+        .style("background", "#faf8f3")
+        .style("border", "3px double #8b7355")
         .style("padding", "40px")
-        .style("min-height", "100vh")
-        .style("display", "flex")
-        .style("align-items", "center")
-        .style("justify-content", "center");
+        .style("box-shadow", "0 4px 15px rgba(0,0,0,0.1)");
     
-    const vizSection = vizContainer.append("div")
-        .style("width", "100%")
-        .style("background", "white")
-        .style("border-radius", "8px")
-        .style("box-shadow", "0 4px 20px rgba(0, 0, 0, 0.1)")
-        .style("padding", "40px");
+    vizFrame.append("div")
+        .attr("class", "viz-frame-title")
+        .style("font-family", "'Playfair Display', serif")
+        .style("font-size", "1.8rem")
+        .style("font-weight", "700")
+        .style("text-align", "center")
+        .style("text-transform", "uppercase")
+        .style("letter-spacing", "2px")
+        .style("margin-bottom", "30px")
+        .style("padding-bottom", "15px")
+        .style("border-bottom", "2px solid #8b7355")
+        .style("color", "#2c2416")
+        .text("Market Regime Analysis");
     
-    vizSection.append("div")
+    vizFrame.append("div")
         .attr("id", "regime-viz-container")
         .style("width", "100%")
-        .style("min-height", "800px");
+        .style("min-height", "800px")
+        .style("background", "#ffffff");
     
     // Call createViz5
     setTimeout(() => {

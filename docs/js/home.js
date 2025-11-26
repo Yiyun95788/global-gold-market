@@ -1,119 +1,113 @@
+// Page 1: Home
 (function() {
-    // Select the home page section
-    const homePage = d3.select("#home-page");
+    const container = d3.select("#home-page");
+    container.html('');
     
-    // Create main content container
-    const content = homePage.append("div")
-        .attr("class", "home-content")
-        .style("text-align", "center")
-        .style("color", "#FAF9F6")
+    // Create fullpage article wrapper
+    const article = container.append("div")
+        .style("min-height", "100vh")
+        .style("background", "rgba(244, 232, 208, 0.75)")
+        .style("padding", "80px 0")
+        .style("display", "flex")
+        .style("flex-direction", "column")
+        .style("justify-content", "center");
+    
+    // Inner content wrapper
+    const innerContent = article.append("div")
         .style("max-width", "1200px")
         .style("margin", "0 auto")
-        .style("padding", "40px");
+        .style("padding", "0 80px");
     
-    // Add decorative gold bar icon (placeholder for image)
-    content.append("div")
-        .attr("class", "home-icon")
-        .style("margin-bottom", "30px")
-        .html('<!-- PLACEHOLDER: Add gold-bars icon image here -->');
+    // Masthead
+    const masthead = innerContent.append("div")
+        .attr("class", "masthead fade-in-up");
     
-    // Main title
-    content.append("h1")
-        .attr("class", "home-main-title fade-in-up")
-        .style("font-size", "4.5rem")
-        .style("font-weight", "700")
-        .style("margin-bottom", "20px")
-        .style("color", "#D4AF37")
-        .style("text-shadow", "0 2px 10px rgba(212, 175, 55, 0.5)")
-        .text("GOLD");
+    masthead.append("div")
+        .attr("class", "masthead-date")
+        .text("Special Edition - November 2025");
     
-    // Subtitle
-    content.append("h2")
-        .attr("class", "home-subtitle fade-in-up")
-        .style("font-size", "2rem")
-        .style("font-weight", "300")
-        .style("margin-bottom", "30px")
-        .style("color", "#FAF9F6")
-        .style("animation-delay", "0.2s")
-        .text("THE GREAT POWER SHIFT");
+    masthead.append("h1")
+        .attr("class", "masthead-title")
+        .html("THE GOLDEN <span class='gold-accent'>CHRONICLE</span>");
     
-    // Divider
-    content.append("div")
-        .attr("class", "gold-divider fade-in-up")
-        .style("width", "120px")
-        .style("height", "3px")
-        .style("background", "linear-gradient(90deg, #D4AF37 0%, #FFD700 100%)")
-        .style("margin", "30px auto")
-        .style("animation-delay", "0.4s");
+    masthead.append("div")
+        .attr("class", "masthead-subtitle")
+        .text("A Data Story of Power, Wealth, and Transformation");
     
-    // Live gold price ticker (animated number)
-    const priceContainer = content.append("div")
-        .attr("class", "price-ticker fade-in-up")
-        .style("margin", "40px 0")
-        .style("animation-delay", "0.6s");
+    // Ornamental divider
+    innerContent.append("div")
+        .attr("class", "ornamental-divider")
+        .style("margin", "40px 0");
     
-    priceContainer.append("div")
-        .style("font-size", "1rem")
-        .style("color", "#FFD700")
-        .style("margin-bottom", "10px")
-        .style("letter-spacing", "2px")
-        .text("CURRENT GOLD PRICE");
+    // Main headline
+    innerContent.append("h2")
+        .attr("class", "article-headline fade-in-up")
+        .style("border-top", "2px solid #2c2416")
+        .style("border-bottom", "2px solid #2c2416")
+        .style("padding", "20px 0")
+        .style("margin", "40px 0 20px 0")
+        .style("text-align", "center")
+        .html("GOLD: THE GREAT <span class='gold-accent'>POWER SHIFT</span>");
     
-    const priceDisplay = priceContainer.append("div")
-        .attr("id", "live-price")
-        .style("font-size", "3.5rem")
-        .style("font-weight", "700")
-        .style("color", "#D4AF37")
-        .style("font-family", "Cinzel, serif")
-        .text("$3,827");
+    // Text content
+    const textSection = innerContent.append("div")
+        .attr("class", "fade-in-up")
+        .style("max-width", "900px")
+        .style("margin", "40px auto");
     
-    priceContainer.append("div")
-        .style("font-size", "1rem")
-        .style("color", "#FFD700")
-        .style("margin-top", "5px")
-        .text("PER OUNCE");
-    
-    // Tagline
-    content.append("p")
-        .attr("class", "home-tagline fade-in-up")
-        .style("font-size", "1.3rem")
-        .style("max-width", "800px")
-        .style("margin", "40px auto")
+    textSection.append("p")
+        .style("text-align", "justify")
+        .style("font-family", "Merriweather, serif")
+        .style("font-size", "1.2rem")
         .style("line-height", "1.8")
-        .style("color", "#FAF9F6")
-        .style("font-weight", "300")
-        .style("animation-delay", "0.8s")
-        .html("In October 2025, gold surged past $3,800 per ounce—a <span style='color: #FFD700; font-weight: 700;'>45% annual gain</span> that broke all records. But this isn't just about price. It's about power.");
+        .style("margin-bottom", "20px")
+        .html("<span style='float: left; font-size: 4rem; line-height: 0.8; font-weight: 700; margin: 5px 10px 0 0; font-family: Playfair Display, serif; color: #8b7355;'>I</span>n the autumn of 2025, gold prices shattered all previous records, surging past $3,800 per ounce. This unprecedented rally marks more than just another market milestone. It signals a fundamental transformation in the global financial order, a shift in economic power that has been decades in the making.");
+    
+    textSection.append("p")
+        .style("text-align", "justify")
+        .style("font-family", "Merriweather, serif")
+        .style("font-size", "1.2rem")
+        .style("line-height", "1.8")
+        .style("margin-bottom", "20px")
+        .html("For centuries, gold has served as humanity's ultimate store of value, a hedge against uncertainty, and a symbol of sovereign power. Today, as geopolitical tensions rise and monetary policies shift, gold is reclaiming its ancient role with renewed urgency.");
+    
+    // Pull quote
+    const pullQuote = innerContent.append("div")
+        .attr("class", "pull-quote fade-in-up")
+        .style("max-width", "700px")
+        .style("margin", "40px auto");
+    
+    pullQuote.append("p")
+        .style("margin", "0")
+        .html("Gold's current surge is not merely a financial event—it is a geopolitical statement.");
+    
+    textSection.append("p")
+        .style("text-align", "justify")
+        .style("font-family", "Merriweather, serif")
+        .style("font-size", "1.2rem")
+        .style("line-height", "1.8")
+        .style("margin-top", "40px")
+        .html("This data story explores the forces driving gold's historic ascent: from the paradox of its safe-haven status to the geographic redistribution of reserves, and the market regimes that reveal deeper truths about our changing world order.");
     
     // Scroll indicator
-    content.append("div")
-        .attr("class", "scroll-indicator fade-in-up")
+    const scrollIndicator = innerContent.append("div")
+        .attr("class", "fade-in-up")
+        .style("text-align", "center")
         .style("margin-top", "60px")
-        .style("animation-delay", "1s")
-        .html('<div style="font-size: 0.9rem; color: #FFD700; margin-bottom: 10px;">SCROLL TO EXPLORE</div><div style="font-size: 2rem; animation: bounce 2s infinite;">↓</div>');
+        .style("padding-bottom", "40px");
     
-    // Add bounce animation for scroll indicator
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% {
-                transform: translateY(0);
-            }
-            40% {
-                transform: translateY(-10px);
-            }
-            60% {
-                transform: translateY(-5px);
-            }
-        }
-    `;
-    document.head.appendChild(style);
+    scrollIndicator.append("div")
+        .style("font-family", "EB Garamond, serif")
+        .style("font-size", "1rem")
+        .style("color", "#5c4a3a")
+        .style("text-transform", "uppercase")
+        .style("letter-spacing", "2px")
+        .style("margin-bottom", "15px")
+        .text("Scroll to Continue");
     
-    // Animate price
-    setInterval(() => {
-        const currentPrice = 3827;
-        const variation = Math.floor(Math.random() * 10) - 5;
-        priceDisplay.text("$" + (currentPrice + variation).toLocaleString());
-    }, 3000);
-    
+    scrollIndicator.append("div")
+        .style("width", "2px")
+        .style("height", "40px")
+        .style("background", "linear-gradient(to bottom, #b8922e, transparent)")
+        .style("margin", "0 auto");
 })();
