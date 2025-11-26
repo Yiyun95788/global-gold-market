@@ -111,6 +111,32 @@
             normalScrollElements: '#viz2-left-panel',
             onLeave: function(origin, destination){
                 destination.item.classList.add('load-background');
+                
+                // Reset tutorial if leaving the balance page
+                if (origin.anchor === 'balance' && window.balanceTutorial) {
+                    if (window.balanceTutorial.isActive) {
+                        window.balanceTutorial.reset();
+                        
+                        // Reset button states
+                        if (window.balanceTutorialControls) {
+                            window.balanceTutorialControls.tutorialBtn.textContent = '▶ TUTORIAL';
+                            window.balanceTutorialControls.backBtn.style.display = 'none';
+                            window.balanceTutorialControls.forwardBtn.style.display = 'none';
+                        }
+                        
+                        // Clean up any remaining tutorial overlays
+                        document.querySelectorAll('div[style*="z-index: 10001"]').forEach(overlay => {
+                            if (overlay.style.position === 'fixed' && 
+                                (overlay.style.background && overlay.style.background.includes('rgba(0, 0, 0, 0.7)') ||
+                                 overlay.style.background && overlay.style.background.includes('rgba(76, 175, 80'))) {
+                                if (typeof overlay.__overlayCleanup === 'function') {
+                                    overlay.__overlayCleanup();
+                                }
+                                overlay.remove();
+                            }
+                        });
+                    }
+                }
             }
         });
     </script>

@@ -188,6 +188,14 @@ class Tutorial {
             this.stages[this.currentStage].cleanup();
         }
     }
+    
+    reset() {
+        this.isActive = false;
+        if (this.stages[this.currentStage]) {
+            this.stages[this.currentStage].cleanup();
+        }
+        this.currentStage = 0;
+    }
 }
 
 // Viz 2 - NATO vs BRICS Gold Balance Scale
@@ -253,7 +261,7 @@ function createViz2() {
         transition: transform 0.2s, box-shadow 0.2s;
         box-shadow: 0 2px 8px rgba(0,0,0,0.2);
     `;
-    tutorialBtn.textContent = '▶ Walkthrough';
+    tutorialBtn.textContent = '▶ TUTORIAL';
     tutorialBtn.onmouseover = () => {
         tutorialBtn.style.transform = 'scale(1.05)';
         tutorialBtn.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
@@ -1234,6 +1242,8 @@ function initViz2(csvData, canvasContainer, tutorialBtn, backBtn, forwardBtn) {
                     'This is a scale that compares countries\' gold reserves.',
                     'top'
                 );
+                const currentLeft = parseFloat(overlay.style.left) || 0;
+                overlay.style.left = (currentLeft + 40) + 'px';
                 stage.addCleanup(() => AnimationLibrary.removeOverlay(overlay));
                 
                 await new Promise(r => setTimeout(r, 500));
@@ -1438,7 +1448,7 @@ function initViz2(csvData, canvasContainer, tutorialBtn, backBtn, forwardBtn) {
         ]),
         
         // Stage 13: End
-        new TutorialStage('Stage 13: Walkthrough Complete!', [
+        new TutorialStage('Stage 13: Tutorial Complete!', [
             async (stage) => {
                 const overlay = document.createElement('div');
                 overlay.style.cssText = `
@@ -1457,9 +1467,9 @@ function initViz2(csvData, canvasContainer, tutorialBtn, backBtn, forwardBtn) {
                     box-shadow: 0 4px 20px rgba(0,0,0,0.3);
                 `;
                 overlay.innerHTML = `
-                    <div style="font-size: 24px; margin-bottom: 10px;">🎉 Walkthrough Complete!</div>
+                    <div style="font-size: 24px; margin-bottom: 10px;">🎉 Tutorial Complete!</div>
                     <div style="font-size: 16px; font-weight: normal;">You\'re ready to explore the visualization.</div>
-                    <div style="font-size: 14px; margin-top: 15px; opacity: 0.9;">Click "End" to close this walkthrough.</div>
+                    <div style="font-size: 14px; margin-top: 15px; opacity: 0.9;">Click "End" to close this tutorial.</div>
                 `;
                 document.body.appendChild(overlay);
                 stage.addCleanup(() => {
@@ -1475,11 +1485,31 @@ function initViz2(csvData, canvasContainer, tutorialBtn, backBtn, forwardBtn) {
     
     const tutorial = new Tutorial(tutorialStages);
     
+    // Store tutorial globally so it can be accessed when navigating away
+    window.balanceTutorial = tutorial;
+    window.balanceTutorialControls = { tutorialBtn, backBtn, forwardBtn };
+    
+    // Auto-animate tutorial button after 5 seconds of inactivity
+    let pulsateCleanup = null;
+    let pulsateTimeout = setTimeout(() => {
+        pulsateCleanup = AnimationLibrary.pulsate(tutorialBtn, 2000, 1.1);
+    }, 5000);
+    
     // Tutorial button click handler
     tutorialBtn.onclick = async () => {
+        // Stop pulsating animation when clicked
+        if (pulsateTimeout) {
+            clearTimeout(pulsateTimeout);
+            pulsateTimeout = null;
+        }
+        if (pulsateCleanup) {
+            pulsateCleanup();
+            pulsateCleanup = null;
+        }
+        
         if (tutorial.isActive) {
             tutorial.end();
-            tutorialBtn.textContent = '▶ Walkthrough';
+            tutorialBtn.textContent = '▶ TUTORIAL';
             backBtn.style.display = 'none';
             forwardBtn.style.display = 'none';
         } else {
