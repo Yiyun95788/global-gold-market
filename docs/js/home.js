@@ -72,14 +72,6 @@
         .html("For centuries, gold has served as humanity's ultimate store of value, a hedge against uncertainty, and a symbol of sovereign power. Today, as geopolitical tensions rise and monetary policies shift, gold is reclaiming its ancient role with renewed urgency.");
     
     // Pull quote
-    const pullQuote = innerContent.append("div")
-        .attr("class", "pull-quote fade-in-up")
-        .style("max-width", "700px")
-        .style("margin", "40px auto");
-    
-    pullQuote.append("p")
-        .style("margin", "0")
-        .html("Gold's current surge is not merely a financial event—it is a geopolitical statement.");
     
     textSection.append("p")
         .style("text-align", "justify")
@@ -88,26 +80,4 @@
         .style("line-height", "1.8")
         .style("margin-top", "40px")
         .html("This data story explores the forces driving gold's historic ascent: from the paradox of its safe-haven status to the geographic redistribution of reserves, and the market regimes that reveal deeper truths about our changing world order.");
-    
-    // Scroll indicator
-    const scrollIndicator = innerContent.append("div")
-        .attr("class", "fade-in-up")
-        .style("text-align", "center")
-        .style("margin-top", "60px")
-        .style("padding-bottom", "40px");
-    
-    scrollIndicator.append("div")
-        .style("font-family", "EB Garamond, serif")
-        .style("font-size", "1rem")
-        .style("color", "#5c4a3a")
-        .style("text-transform", "uppercase")
-        .style("letter-spacing", "2px")
-        .style("margin-bottom", "15px")
-        .text("Scroll to Continue");
-    
-    scrollIndicator.append("div")
-        .style("width", "2px")
-        .style("height", "40px")
-        .style("background", "linear-gradient(to bottom, #b8922e, transparent)")
-        .style("margin", "0 auto");
 })();
