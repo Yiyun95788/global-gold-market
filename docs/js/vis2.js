@@ -43,7 +43,7 @@ const AnimationLibrary = {
     },
     
     // Overlay with pointer that follows the target on scroll/resize
-    createOverlay: function(element, message = '', arrowDirection = 'top') {
+    createOverlay: function(element, message = '', arrowDirection = 'top', offsetX = 0, offsetY = 0) {
         const overlay = document.createElement('div');
         overlay.style.cssText = `
             position: fixed; /* use viewport coords to match getBoundingClientRect */
@@ -56,17 +56,19 @@ const AnimationLibrary = {
             max-width: 250px;
             word-wrap: break-word;
         `;
-        overlay.innerHTML = `<div style="margin-bottom: 8px;">${message}</div>
-            <div style="font-size: 12px; opacity: 0.8;">click back/next or left/right arrow keys to continue</div>`;
+        overlay.innerHTML = message + `<div style="font-size: 12px; opacity: 0.8; margin-top: 8px;">click back/next or left/right arrow keys to continue</div>`;
 
         const updatePosition = () => {
             if (!element) return;
             const rect = element.getBoundingClientRect();
-            overlay.style.left = rect.left + rect.width / 2 - 125 + 100 + 'px';
+            // Convert percentage offsets to pixels based on viewport
+            const xOffset = (offsetX / 100) * window.innerWidth;
+            const yOffset = (offsetY / 100) * window.innerHeight;
+            overlay.style.left = rect.left + rect.width / 2 - 125 + 100 + xOffset + 'px';
             if (arrowDirection === 'top') {
-                overlay.style.top = rect.top - 100 + 'px';
+                overlay.style.top = rect.top - 100 + yOffset + 'px';
             } else {
-                overlay.style.top = rect.bottom + 20 + 'px';
+                overlay.style.top = rect.bottom + 20 + yOffset + 'px';
             }
         };
 
@@ -253,7 +255,7 @@ function createViz2() {
         transition: transform 0.2s, box-shadow 0.2s;
         box-shadow: 0 2px 8px rgba(0,0,0,0.2);
     `;
-    tutorialBtn.textContent = '▶ Walkthrough';
+    tutorialBtn.textContent = '▶ TUTORIAL';
     tutorialBtn.onmouseover = () => {
         tutorialBtn.style.transform = 'scale(1.05)';
         tutorialBtn.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
@@ -574,9 +576,36 @@ function initViz2(csvData, canvasContainer, tutorialBtn, backBtn, forwardBtn) {
             updateExplanation('g7-brics');
             compareG7vsBRICS();
         });
-        document.getElementById('viz2-filter-all').addEventListener('click', () => setFilter('all'));
-        document.getElementById('viz2-filter-g7').addEventListener('click', () => setFilter('g7'));
-        document.getElementById('viz2-filter-brics').addEventListener('click', () => setFilter('brics'));
+        document.getElementById('viz2-filter-all').addEventListener('click', () => {
+            setFilter('all');
+            // Scroll filter section to top of sidebar
+            const filterSection = document.getElementById('viz2-filter-all').parentElement;
+            const leftPanel = document.getElementById('viz2-left-panel');
+            if (filterSection && leftPanel) {
+                const offset = filterSection.offsetTop - leftPanel.offsetTop;
+                leftPanel.scrollTo({ top: offset, behavior: 'smooth' });
+            }
+        });
+        document.getElementById('viz2-filter-g7').addEventListener('click', () => {
+            setFilter('g7');
+            // Scroll filter section to top of sidebar
+            const filterSection = document.getElementById('viz2-filter-g7').parentElement;
+            const leftPanel = document.getElementById('viz2-left-panel');
+            if (filterSection && leftPanel) {
+                const offset = filterSection.offsetTop - leftPanel.offsetTop;
+                leftPanel.scrollTo({ top: offset, behavior: 'smooth' });
+            }
+        });
+        document.getElementById('viz2-filter-brics').addEventListener('click', () => {
+            setFilter('brics');
+            // Scroll filter section to top of sidebar
+            const filterSection = document.getElementById('viz2-filter-brics').parentElement;
+            const leftPanel = document.getElementById('viz2-left-panel');
+            if (filterSection && leftPanel) {
+                const offset = filterSection.offsetTop - leftPanel.offsetTop;
+                leftPanel.scrollTo({ top: offset, behavior: 'smooth' });
+            }
+        });
         
         const btnTop3 = document.getElementById('viz2-compare-g7-brics-top3');
         if (btnTop3) {
@@ -998,11 +1027,14 @@ function initViz2(csvData, canvasContainer, tutorialBtn, backBtn, forwardBtn) {
     let dragOverlay = null;
     
     function startDragCountry(country, e) {
+        e.preventDefault();
         draggedCountry = country;
         
         dragOverlay = document.createElement('div');
         dragOverlay.style.cssText = `
             position: fixed;
+            left: ${e.clientX + 10}px;
+            top: ${e.clientY + 10}px;
             padding: 10px;
             background: linear-gradient(135deg, ${getAllianceColor(country.alliance)} 0%, ${getAllianceColor(country.alliance)}dd 100%);
             color: white;
@@ -1012,23 +1044,28 @@ function initViz2(csvData, canvasContainer, tutorialBtn, backBtn, forwardBtn) {
             font-size: 12px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.3);
             opacity: 0.9;
+            display: block;
         `;
         dragOverlay.innerHTML = `
             <div style="font-weight: bold;">${country.name}</div>
             <div style="font-size: 11px;">${country.tonnes.toFixed(1)} tonnes</div>
         `;
         document.body.appendChild(dragOverlay);
+        document.body.style.cursor = 'grabbing';
         
         function onMouseMove(e) {
-            dragOverlay.style.left = (e.pageX + 10) + 'px';
-            dragOverlay.style.top = (e.pageY + 10) + 'px';
+            if (dragOverlay) {
+                dragOverlay.style.left = (e.clientX + 10) + 'px';
+                dragOverlay.style.top = (e.clientY + 10) + 'px';
+            }
         }
         
         function onMouseUp(e) {
             document.removeEventListener('mousemove', onMouseMove);
             document.removeEventListener('mouseup', onMouseUp);
+            document.body.style.cursor = '';
             
-            if (dragOverlay) {
+            if (dragOverlay && dragOverlay.parentNode) {
                 document.body.removeChild(dragOverlay);
                 dragOverlay = null;
             }
@@ -1044,8 +1081,6 @@ function initViz2(csvData, canvasContainer, tutorialBtn, backBtn, forwardBtn) {
         
         document.addEventListener('mousemove', onMouseMove);
         document.addEventListener('mouseup', onMouseUp);
-        
-        onMouseMove(e);
     }
     
     // G7 vs BRICS comparison
@@ -1221,6 +1256,24 @@ function initViz2(csvData, canvasContainer, tutorialBtn, backBtn, forwardBtn) {
     }
     
     // ========== TUTORIAL STAGES ==========
+    // Popup position offsets: [x%, y%] as percentage of viewport
+    // Positive x = right, positive y = down
+    // Example: [10, 5] = 10% of viewport width right, 5% of viewport height down
+    const popupOffsets = [
+        [-14, 20],    // Stage 1: Meet the Scale
+        [-4, 0],       // Stage 2: Navigate Time
+        [-4, 16],       // Stage 3: Compare Alliances
+        [0, 22],       // Stage 4: Read the Scale
+        [-2, -2 ],       // Stage 5: Scale Information
+        [-4, 0],       // Stage 6: Navigate to 2019
+        [-4, 16],       // Stage 7: Compare Again
+        [-4, 1],       // Stage 8: Changed Balance
+        [-4, -2],       // Stage 9: Quick Comparisons
+        [-4, 15],       // Stage 10: Reset Scale
+        [7, 6],       // Stage 11: Alliance Filters
+        [-4, -18]        // Stage 12: Drag Countries
+    ];
+    
     const tutorialStages = [
         // Stage 1: Explore the scale
         new TutorialStage('Stage 1: Meet the Scale', [
@@ -1231,8 +1284,10 @@ function initViz2(csvData, canvasContainer, tutorialBtn, backBtn, forwardBtn) {
                 
                 const overlay = AnimationLibrary.createOverlay(
                     svg,
-                    'This is a scale that compares countries\' gold reserves.',
-                    'top'
+                    `<div style="margin-bottom: 6px;">This is a scale that compares countries' gold reserves.</div>
+                    <div style="font-weight: bold;">Action: Click the blue next button to continue.</div>`,
+                    'top',
+                    popupOffsets[0][0], popupOffsets[0][1]
                 );
                 stage.addCleanup(() => AnimationLibrary.removeOverlay(overlay));
                 
@@ -1249,8 +1304,10 @@ function initViz2(csvData, canvasContainer, tutorialBtn, backBtn, forwardBtn) {
                 
                 const overlay = AnimationLibrary.createOverlay(
                     timeSlider,
-                    'Use this slider to explore different time periods. Drag it to 1952.',
-                    'bottom'
+                    `<div style="margin-bottom: 6px;">Use this slider to explore different time periods.</div>
+                    <div style="font-weight: bold;">Action: Drag the slider to 1952.</div>`,
+                    'bottom',
+                    popupOffsets[1][0], popupOffsets[1][1]
                 );
                 stage.addCleanup(() => AnimationLibrary.removeOverlay(overlay));
                 
@@ -1267,8 +1324,10 @@ function initViz2(csvData, canvasContainer, tutorialBtn, backBtn, forwardBtn) {
                 
                 const overlay = AnimationLibrary.createOverlay(
                     compareBtn,
-                    'Click this button to see how G7 and BRICS gold reserves compare!',
-                    'top'
+                    `<div style="margin-bottom: 6px;">See how G7 and BRICS gold reserves compare.</div>
+                    <div style="font-weight: bold;">Action: Click the 'G7 vs BRICS' button.</div>`,
+                    'top',
+                    popupOffsets[2][0], popupOffsets[2][1]
                 );
                 stage.addCleanup(() => AnimationLibrary.removeOverlay(overlay));
                 
@@ -1285,7 +1344,10 @@ function initViz2(csvData, canvasContainer, tutorialBtn, backBtn, forwardBtn) {
                 
                 const overlay = AnimationLibrary.createOverlay(
                     weightDisplay,
-                    'These boxes show the total weight on each side of the scale.Observe how G7 has about 22k more tonnes than BRICS!'
+                    `<div style="margin-bottom: 6px;">These boxes show the total weight on each side of the scale.</div>
+                    <div style="font-weight: bold;">Action: Observe how G7 has about 22k more tonnes than BRICS.</div>`,
+                    'top',
+                    popupOffsets[3][0], popupOffsets[3][1]
                 );
                 stage.addCleanup(() => AnimationLibrary.removeOverlay(overlay));
                 
@@ -1302,8 +1364,10 @@ function initViz2(csvData, canvasContainer, tutorialBtn, backBtn, forwardBtn) {
                 
                 const overlay = AnimationLibrary.createOverlay(
                     explanationBox,
-                    'Get the context of the comparison here. This box provides detailed information about what you\'re viewing.',
-                    'bottom'
+                    `<div style="margin-bottom: 6px;">This box provides detailed information about what you're viewing.</div>
+                    <div style="font-weight: bold;">Action: Read through.</div>`,
+                    'bottom',
+                    popupOffsets[4][0], popupOffsets[4][1]
                 );
                 stage.addCleanup(() => AnimationLibrary.removeOverlay(overlay));
                 
@@ -1320,8 +1384,10 @@ function initViz2(csvData, canvasContainer, tutorialBtn, backBtn, forwardBtn) {
                 
                 const overlay = AnimationLibrary.createOverlay(
                     timeSlider,
-                    'Now drag the slider to 2019 to see the most recent data.',
-                    'bottom'
+                    `<div style="margin-bottom: 6px;">See the most recent data by navigating to 2019.</div>
+                    <div style="font-weight: bold;">Action: Drag the slider to 2019.</div>`,
+                    'bottom',
+                    popupOffsets[5][0], popupOffsets[5][1]
                 );
                 stage.addCleanup(() => AnimationLibrary.removeOverlay(overlay));
                 
@@ -1338,8 +1404,10 @@ function initViz2(csvData, canvasContainer, tutorialBtn, backBtn, forwardBtn) {
                 
                 const overlay = AnimationLibrary.createOverlay(
                     compareBtn,
-                    'Click the G7 vs BRICS button again to see the comparison in 2019.',
-                    'top'
+                    `<div style="margin-bottom: 6px;">See the comparison in 2019.</div>
+                    <div style="font-weight: bold;">Action: Click the 'G7 vs BRICS' button again.</div>`,
+                    'top',
+                    popupOffsets[6][0], popupOffsets[6][1]
                 );
                 stage.addCleanup(() => AnimationLibrary.removeOverlay(overlay));
                 
@@ -1356,8 +1424,10 @@ function initViz2(csvData, canvasContainer, tutorialBtn, backBtn, forwardBtn) {
                 
                 const overlay = AnimationLibrary.createOverlay(
                     weightsDiv,
-                    'The difference has dramatically dropped to around 12k tonnes, as G7 sells gold and BRICS buys gold.',
-                    'bottom'
+                    `<div style="margin-bottom: 6px;">The balance has shifted as G7 sells gold and BRICS buys gold.</div>
+                    <div style="font-weight: bold;">Action: Notice the difference has dropped to around 12k tonnes.</div>`,
+                    'bottom',
+                    popupOffsets[7][0], popupOffsets[7][1]
                 );
                 stage.addCleanup(() => AnimationLibrary.removeOverlay(overlay));
                 
@@ -1374,8 +1444,10 @@ function initViz2(csvData, canvasContainer, tutorialBtn, backBtn, forwardBtn) {
                 
                 const overlay = AnimationLibrary.createOverlay(
                     quickCompareSection,
-                    'Here is a list of comparisons to take note of. These buttons let you quickly compare different groups.',
-                    'bottom'
+                    `<div style="margin-bottom: 6px;">These buttons let you quickly compare different groups.</div>
+                    <div style="font-weight: bold;">Action: Explore the list of comparison options.</div>`,
+                    'bottom',
+                    popupOffsets[8][0], popupOffsets[8][1]
                 );
                 stage.addCleanup(() => AnimationLibrary.removeOverlay(overlay));
                 
@@ -1392,8 +1464,10 @@ function initViz2(csvData, canvasContainer, tutorialBtn, backBtn, forwardBtn) {
                 
                 const overlay = AnimationLibrary.createOverlay(
                     resetBtn,
-                    'Click this button to reset the scale and clear all countries from both sides.',
-                    'top'
+                    `<div style="margin-bottom: 6px;">This button resets the scale and clears all countries.</div>
+                    <div style="font-weight: bold;">Action: Click the 'Reset Scale' button.</div>`,
+                    'top',
+                    popupOffsets[9][0], popupOffsets[9][1]
                 );
                 stage.addCleanup(() => AnimationLibrary.removeOverlay(overlay));
                 
@@ -1410,8 +1484,10 @@ function initViz2(csvData, canvasContainer, tutorialBtn, backBtn, forwardBtn) {
                 
                 const overlay = AnimationLibrary.createOverlay(
                     filterSection,
-                    'These filters let you view countries by two major economic alliances: G7 and BRICS.',
-                    'top'
+                    `<div style="margin-bottom: 6px;">These filters let you view countries by major economic alliances.</div>
+                    <div style="font-weight: bold;">Action: Try filtering by G7 or BRICS.</div>`,
+                    'top',
+                    popupOffsets[10][0], popupOffsets[10][1]
                 );
                 stage.addCleanup(() => AnimationLibrary.removeOverlay(overlay));
                 
@@ -1428,8 +1504,10 @@ function initViz2(csvData, canvasContainer, tutorialBtn, backBtn, forwardBtn) {
                 
                 const overlay = AnimationLibrary.createOverlay(
                     countryList,
-                    'You can drag countries onto one side of the scale to compare them. Try it yourself!',
-                    'top'
+                    `<div style="margin-bottom: 6px;">You can drag countries onto the scale to compare them.</div>
+                    <div style="font-weight: bold;">Action: Try dragging a country to one side of the scale.</div>`,
+                    'top',
+                    popupOffsets[11][0], popupOffsets[11][1]
                 );
                 stage.addCleanup(() => AnimationLibrary.removeOverlay(overlay));
                 
