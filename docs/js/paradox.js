@@ -113,7 +113,7 @@ function createViz4Paradox() {
     const assets = ['Gold', 'BTC', 'USD', 'Silver', 'S&P 500'];
     
     Promise.all([
-        d3.csv('../w6_datasets/SP500 oil gold bitcoin.csv'),
+        d3.csv('data/SP500_oil_gold_bitcoin_extended.csv'),
         d3.csv('data/Silver Futures Historical Data.csv'),
         d3.csv('data/US Dollar Index Futures Historical Data.csv')
     ]).then(function([mainData, silverData, usdData]) {
@@ -136,7 +136,7 @@ function createViz4Paradox() {
         });
         
         const correlationData = {};
-        for (let year = 2010; year <= 2024; year++) {
+        for (let year = 2010; year <= 2025; year++) {
             const yearData = Object.keys(combined)
                 .filter(d => d.startsWith(year.toString()))
                 .map(d => combined[d])
