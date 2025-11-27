@@ -1,50 +1,127 @@
 // Page 3: Historical Context - River Chart
 (function() {
     const container = d3.select("#history-content");
+    container.html('');
     
-    // Create two-column layout
-    const pageContainer = container.append("div")
-        .attr("class", "viz-page-container");
+    // fullpage article wrapper
+    const article = container.append("div")
+        .style("min-height", "100vh")
+        .style("background", "rgba(244, 232, 208, 0.75)")
+        .style("padding", "80px 0");
     
-    // Left: Text section
-    const textSection = pageContainer.append("div")
-        .attr("class", "viz-text-section fade-in-up");
+    const innerContent = article.append("div")
+        .style("max-width", "1600px")
+        .style("margin", "0 auto")
+        .style("padding", "0 80px");
     
-    textSection.append("h2")
-        .html("The Long <span class='gold-accent'>View</span>");
+    // Headline
+    innerContent.append("h2")
+        .attr("class", "article-headline scroll-reveal")
+        .style("border-top", "2px solid #2c2416")
+        .style("border-bottom", "2px solid #2c2416")
+        .style("padding", "20px 0")
+        .style("margin", "0 0 20px 0")
+        .text("THE LONG VIEW");
     
-    textSection.append("div")
-        .attr("class", "gold-divider");
+    // Subheadline
+    innerContent.append("div")
+        .attr("class", "article-subheadline scroll-reveal")
+        .text("Two Decades of Gold Price Turbulence");
     
-    textSection.append("p")
-        .attr("class", "subtitle")
-        .text("Two decades of turbulence");
+    // Dateline
+    innerContent.append("div")
+        .attr("class", "dateline scroll-reveal")
+        .style("margin-bottom", "30px")
+        .text("HISTORICAL PRICE ANALYSIS");
     
-    textSection.append("p")
-        .html("Gold's journey from 2004 to 2025 tells the story of global crises. The 2008 financial collapse, European debt crisis, COVID-19 pandemic, and geopolitical tensions—each event left its mark.");
+    // Ornamental divider
+    innerContent.append("div")
+        .attr("class", "ornamental-divider");
     
-    textSection.append("div")
-        .attr("class", "highlight-box")
-        .html("<strong>2025 is unprecedented.</strong> With 86% year-over-year growth and crisis-level volatility, we're witnessing the most extreme sustained increase in over twenty years.");
+    // Two-column text section
+    const textColumns = innerContent.append("div")
+        .attr("class", "text-section-columns scroll-reveal")
+        .style("column-count", "2")
+        .style("column-gap", "50px")
+        .style("column-rule", "1px solid #d4c4a8")
+        .style("margin", "40px 0")
+        .style("max-width", "1200px")
+        .style("margin-left", "auto")
+        .style("margin-right", "auto");
     
-    textSection.append("p")
-        .text("The river of gold flows wider when uncertainty peaks. Track the price movements and volatility patterns that shaped today's market.");
+    textColumns.append("p")
+        .style("font-family", "'Merriweather', serif")
+        .style("font-size", "1.05rem")
+        .style("line-height", "1.8")
+        .style("text-align", "justify")
+        .style("margin-bottom", "20px")
+        .html("<span style='float: left; font-size: 4rem; line-height: 0.8; font-weight: 700; margin: 5px 10px 0 0; font-family: Playfair Display, serif; color: #8b7355;'>G</span>old's journey from 2004 to 2025 chronicles global crises and monetary upheaval. The 2008 financial collapse, European debt crisis, COVID-19 pandemic, and geopolitical tensions each left their mark on gold's trajectory.");
     
-    // Right: Visualization section
-    const vizSection = pageContainer.append("div")
-        .attr("class", "viz-visual-section");
+    textColumns.append("p")
+        .style("font-family", "'Merriweather', serif")
+        .style("font-size", "1.05rem")
+        .style("line-height", "1.8")
+        .style("text-align", "justify")
+        .style("margin-bottom", "20px")
+        .html("The year 2025 stands unprecedented. With 86 percent year-over-year growth and crisis-level volatility, we witness the most extreme sustained increase in over twenty years. The river of gold flows widest when uncertainty peaks.");
     
-    vizSection.append("div")
+    textColumns.append("p")
+        .style("font-family", "'Merriweather', serif")
+        .style("font-size", "1.05rem")
+        .style("line-height", "1.8")
+        .style("text-align", "justify")
+        .html("Each surge tells a story: Nixon's severing of the dollar-gold link in 1971, the inflationary 1980s, the Great Recession, pandemic lockdowns, and now—a moment that may define the next era of global finance.");
+    
+    // Pull quote
+    const pullQuote = innerContent.append("div")
+        .attr("class", "pull-quote scroll-reveal")
+        .style("max-width", "800px")
+        .style("margin", "50px auto");
+    
+    pullQuote.append("p")
+        .style("margin", "0")
+        .style("font-size", "1.4rem")
+        .text("Gold's price history is a chronicle of monetary upheaval and the eternal flight to safety.");
+    
+    // Instruction text
+    innerContent.append("p")
+        .attr("class", "scroll-reveal")
+        .style("text-align", "center")
+        .style("font-family", "'EB Garamond', serif")
+        .style("font-size", "1.1rem")
+        .style("line-height", "1.6")
+        .style("margin", "50px auto 30px")
+        .style("max-width", "800px")
+        .style("color", "#5c4a3a")
+        .style("font-style", "italic")
+        .html("Hover over the river chart to explore price movements and volatility patterns through two decades of economic history. The width of the river represents price volatility.");
+    
+    // Visualization frame
+    const vizFrame = innerContent.append("div")
+        .attr("class", "viz-frame scroll-reveal")
+        .style("margin-top", "50px")
+        .style("margin-bottom", "80px")
+        .style("position", "relative");
+    
+    vizFrame.append("div")
+        .attr("class", "viz-frame-title")
+        .text("Gold Price Evolution: 2004-2025");
+    
+    const vizContainer = vizFrame.append("div")
         .attr("id", "river-chart-container")
-        .style("width", "100%");
+        .style("width", "100%")
+        .style("min-height", "650px")
+        .style("display", "flex")
+        .style("justify-content", "center")
+        .style("align-items", "center")
+        .style("padding", "30px 0")
+        .style("position", "relative");
     
     // Load and process data
     d3.csv('../w6_datasets/XAU_15m_data_cleaned.csv').then(rawData => {
         
-        // Sample data which take every 5th row
         const sampledData = rawData.filter((d, i) => i % 5 === 0);
         
-        // Parse and clean data
         const cleanData = sampledData
             .map(d => ({
                 date: new Date(d.Date),
@@ -55,40 +132,37 @@
             .filter(d => !isNaN(d.close) && d.date instanceof Date && !isNaN(d.date))
             .sort((a, b) => a.date - b.date);
         
-        // Calculate 90-day rolling volatility for smoother river
         cleanData.forEach((d, i) => {
             const window = cleanData.slice(Math.max(0, i - 90), i + 1);
             const stdDev = d3.deviation(window, w => w.close);
             d.volatility = stdDev || 10;
         });
         
-        // Setup dimensions
-        const margin = {top: 80, right: 120, bottom: 70, left: 90};
-        const width = 1000 - margin.left - margin.right;
-        const height = 500 - margin.top - margin.bottom;
+        const margin = {top: 90, right: 140, bottom: 80, left: 100};
+        const width = 1200 - margin.left - margin.right;
+        const height = 550 - margin.top - margin.bottom;
         
         const svg = d3.select("#river-chart-container")
             .append("svg")
             .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom);
+            .attr("height", height + margin.top + margin.bottom)
+            .style("background", "#faf8f3")
+            .style("display", "block");
         
-        // Add background gradient
         const bgGradient = svg.append("defs")
             .append("linearGradient")
             .attr("id", "bg-gradient")
-            .attr("x1", "0%")
-            .attr("y1", "0%")
-            .attr("x2", "0%")
-            .attr("y2", "100%");
+            .attr("x1", "0%").attr("y1", "0%")
+            .attr("x2", "0%").attr("y2", "100%");
         
         bgGradient.append("stop")
             .attr("offset", "0%")
-            .attr("stop-color", "#f8f6f1")
+            .attr("stop-color", "#faf8f3")
             .attr("stop-opacity", 1);
         
         bgGradient.append("stop")
             .attr("offset", "100%")
-            .attr("stop-color", "#ffffff")
+            .attr("stop-color", "#f4e8d0")
             .attr("stop-opacity", 1);
         
         svg.append("rect")
@@ -99,7 +173,6 @@
         const g = svg.append("g")
             .attr("transform", `translate(${margin.left},${margin.top})`);
         
-        // Scales
         const xScale = d3.scaleTime()
             .domain(d3.extent(cleanData, d => d.date))
             .range([0, width]);
@@ -112,29 +185,26 @@
             .domain([0, d3.max(cleanData, d => d.volatility)])
             .range([8, 80]);
         
-        // Create river gradient with gold tones
         const riverGradient = svg.append("defs")
             .append("linearGradient")
             .attr("id", "river-gradient")
-            .attr("x1", "0%")
-            .attr("x2", "100%");
+            .attr("x1", "0%").attr("x2", "100%");
         
         riverGradient.append("stop")
             .attr("offset", "0%")
-            .attr("stop-color", "#f4e5c2")
+            .attr("stop-color", "#e6d5b8")
             .attr("stop-opacity", 0.6);
         
         riverGradient.append("stop")
             .attr("offset", "50%")
-            .attr("stop-color", "#e6c66f")
+            .attr("stop-color", "#d4af37")
             .attr("stop-opacity", 0.7);
         
         riverGradient.append("stop")
             .attr("offset", "100%")
-            .attr("stop-color", "#D4AF37")
+            .attr("stop-color", "#b8922e")
             .attr("stop-opacity", 0.8);
         
-        // Create area generator for river
         const area = d3.area()
             .defined(d => !isNaN(d.close) && !isNaN(d.volatility))
             .x(d => xScale(d.date))
@@ -142,7 +212,6 @@
             .y1(d => yScale(d.close) - volatilityScale(d.volatility) / 2)
             .curve(d3.curveCatmullRom.alpha(0.5));
         
-        // Draw river shadow
         g.append("path")
             .datum(cleanData)
             .attr("d", area)
@@ -150,7 +219,6 @@
             .style("opacity", 0.1)
             .attr("transform", "translate(3, 3)");
         
-        // Draw river
         g.append("path")
             .datum(cleanData)
             .attr("class", "river-area")
@@ -158,7 +226,6 @@
             .style("fill", "url(#river-gradient)")
             .style("opacity", 0.85);
         
-        // Draw center line
         const line = d3.line()
             .defined(d => !isNaN(d.close))
             .x(d => xScale(d.date))
@@ -170,11 +237,10 @@
             .attr("class", "price-line")
             .attr("d", line)
             .style("fill", "none")
-            .style("stroke", "#B8860B")
+            .style("stroke", "#8b7355")
             .style("stroke-width", 2.5)
             .style("opacity", 0.9);
         
-        // Major events
         const events = [
             {year: 2008, month: 9, label: '2008 Crisis'},
             {year: 2011, month: 9, label: 'EU Debt'},
@@ -194,40 +260,34 @@
             if (dataPoint) {
                 const y = yScale(dataPoint.close);
                 
-                // Event line
                 g.append("line")
-                    .attr("x1", x)
-                    .attr("x2", x)
-                    .attr("y1", y)
-                    .attr("y2", -30)
-                    .style("stroke", "#8B4513")
+                    .attr("x1", x).attr("x2", x)
+                    .attr("y1", y).attr("y2", -40)
+                    .style("stroke", "#5c4a3a")
                     .style("stroke-width", 2)
                     .style("stroke-dasharray", "5,5")
                     .style("opacity", 0.6);
                 
-                // Event label background
                 g.append("rect")
-                    .attr("x", x - 30)
-                    .attr("y", -48)
-                    .attr("width", 60)
-                    .attr("height", 16)
-                    .attr("rx", 3)
-                    .style("fill", "#fff")
-                    .style("opacity", 0.9);
+                    .attr("x", x - 35).attr("y", -58)
+                    .attr("width", 70).attr("height", 18)
+                    .attr("rx", 4)
+                    .style("fill", "#f4e8d0")
+                    .style("stroke", "#8b7355")
+                    .style("stroke-width", 1.5)
+                    .style("opacity", 0.95);
                 
-                // Event label
                 g.append("text")
-                    .attr("x", x)
-                    .attr("y", -36)
+                    .attr("x", x).attr("y", -44)
                     .attr("text-anchor", "middle")
-                    .style("font-size", "10px")
+                    .style("font-size", "11px")
                     .style("font-weight", "700")
-                    .style("fill", "#8B4513")
+                    .style("font-family", "'Merriweather', serif")
+                    .style("fill", "#2c2416")
                     .text(event.label);
             }
         });
         
-        // Axes
         const xAxis = d3.axisBottom(xScale)
             .ticks(12)
             .tickFormat(d3.timeFormat("%Y"));
@@ -239,123 +299,197 @@
         g.append("g")
             .attr("transform", `translate(0,${height})`)
             .call(xAxis)
+            .style("font-family", "'Merriweather', serif")
             .style("font-size", "12px")
-            .style("color", "#666");
+            .style("color", "#5c4a3a")
+            .selectAll("text")
+            .style("font-weight", "600");
         
         g.append("g")
             .call(yAxis)
+            .style("font-family", "'Merriweather', serif")
             .style("font-size", "12px")
-            .style("color", "#666");
+            .style("color", "#5c4a3a")
+            .selectAll("text")
+            .style("font-weight", "600");
         
-        // Axis labels
         g.append("text")
             .attr("x", width / 2)
-            .attr("y", height + 50)
+            .attr("y", height + 55)
             .attr("text-anchor", "middle")
+            .style("font-family", "'Merriweather', serif")
             .style("font-size", "14px")
-            .style("font-weight", "600")
-            .style("fill", "#2c3e50")
+            .style("font-weight", "700")
+            .style("fill", "#2c2416")
             .text("Year");
         
         g.append("text")
             .attr("transform", "rotate(-90)")
             .attr("x", -height / 2)
-            .attr("y", -60)
+            .attr("y", -65)
             .attr("text-anchor", "middle")
+            .style("font-family", "'Merriweather', serif")
             .style("font-size", "14px")
-            .style("font-weight", "600")
-            .style("fill", "#2c3e50")
+            .style("font-weight", "700")
+            .style("fill", "#2c2416")
             .text("Gold Price (USD)");
         
-        // Legend with decorative box
         const legend = g.append("g")
-            .attr("transform", `translate(${width + 15}, 30)`);
+            .attr("transform", `translate(${width + 20}, 30)`);
         
         legend.append("rect")
-            .attr("x", -10)
-            .attr("y", -10)
-            .attr("width", 95)
-            .attr("height", 70)
-            .attr("rx", 5)
-            .style("fill", "#fff")
-            .style("stroke", "#D4AF37")
+            .attr("x", -12).attr("y", -12)
+            .attr("width", 105).attr("height", 80)
+            .attr("rx", 6)
+            .style("fill", "#f4e8d0")
+            .style("stroke", "#8b7355")
             .style("stroke-width", 2)
-            .style("opacity", 0.9);
+            .style("opacity", 0.95);
         
         legend.append("text")
-            .attr("x", 0)
-            .attr("y", 5)
-            .style("font-size", "11px")
+            .attr("x", 0).attr("y", 5)
+            .style("font-family", "'Merriweather', serif")
+            .style("font-size", "12px")
             .style("font-weight", "700")
-            .style("fill", "#2c3e50")
+            .style("fill", "#2c2416")
             .text("River Width");
         
         legend.append("text")
-            .attr("x", 0)
-            .attr("y", 22)
-            .style("font-size", "10px")
-            .style("fill", "#666")
-            .text("= Volatility");
+            .attr("x", 0).attr("y", 23)
+            .style("font-family", "'Merriweather', serif")
+            .style("font-size", "11px")
+            .style("fill", "#5c4a3a")
+            .text("= Price Volatility");
         
-        // Add mini river illustration in legend
-        const miniRiver = legend.append("g").attr("transform", "translate(10, 32)");
+        const miniRiver = legend.append("g").attr("transform", "translate(10, 35)");
         miniRiver.append("path")
             .attr("d", "M0,10 Q20,5 40,10 Q60,15 70,10")
             .style("fill", "none")
-            .style("stroke", "#D4AF37")
-            .style("stroke-width", 8)
+            .style("stroke", "#d4af37")
+            .style("stroke-width", 10)
             .style("opacity", 0.5);
         
         miniRiver.append("path")
             .attr("d", "M0,10 Q20,5 40,10 Q60,15 70,10")
             .style("fill", "none")
-            .style("stroke", "#B8860B")
-            .style("stroke-width", 2);
+            .style("stroke", "#8b7355")
+            .style("stroke-width", 2.5);
         
-        // Tooltip
-        const tooltip = d3.select("body")
+        const tooltip = d3.select("#river-chart-container")
             .append("div")
-            .attr("class", "tooltip")
-            .style("opacity", 0);
+            .attr("class", "river-tooltip")
+            .style("position", "absolute")
+            .style("background", "rgba(28, 24, 20, 0.95)")
+            .style("border", "2px solid #d4af37")
+            .style("border-radius", "6px")
+            .style("padding", "12px 16px")
+            .style("font-family", "'Merriweather', serif")
+            .style("font-size", "13px")
+            .style("line-height", "1.6")
+            .style("color", "#f4e8d0")
+            .style("box-shadow", "0 4px 12px rgba(0,0,0,0.4)")
+            .style("pointer-events", "none")
+            .style("opacity", 0)
+            .style("z-index", "10000")
+            .style("transition", "opacity 0.2s");
         
-        // Interactive overlay
+        // Add focus circle for hover
+        const focus = g.append("g")
+            .style("display", "none");
+        
+        focus.append("circle")
+            .attr("r", 7)
+            .style("fill", "#d4af37")
+            .style("stroke", "#2c2416")
+            .style("stroke-width", 3);
+        
+        focus.append("line")
+            .attr("class", "focus-line-x")
+            .style("stroke", "#8b7355")
+            .style("stroke-width", 1.5)
+            .style("stroke-dasharray", "4,4")
+            .style("opacity", 0.6);
+        
+        focus.append("line")
+            .attr("class", "focus-line-y")
+            .style("stroke", "#8b7355")
+            .style("stroke-width", 1.5)
+            .style("stroke-dasharray", "4,4")
+            .style("opacity", 0.6);
+        
         const bisect = d3.bisector(d => d.date).left;
         
-        g.append("rect")
+        // Overlay for mouse tracking
+        svg.append("rect")
+            .attr("class", "mouse-overlay")
+            .attr("transform", `translate(${margin.left},${margin.top})`)
             .attr("width", width)
             .attr("height", height)
             .style("fill", "none")
             .style("pointer-events", "all")
+            .style("cursor", "crosshair")
+            .on("mouseover", function() {
+                focus.style("display", null);
+            })
+            .on("mouseout", function() {
+                focus.style("display", "none");
+                tooltip.style("opacity", 0);
+            })
             .on("mousemove", function(event) {
-                const [mx] = d3.pointer(event);
+                const [mx] = d3.pointer(event, this);
                 const date = xScale.invert(mx);
                 const index = bisect(cleanData, date);
                 const d = cleanData[index];
                 
                 if (d) {
-                    tooltip.transition().duration(100).style("opacity", 0.95);
+                    const x = xScale(d.date);
+                    const y = yScale(d.close);
+                    
+                    // Update focus position
+                    focus.attr("transform", `translate(${x},${y})`);
+                    focus.select(".focus-line-x")
+                        .attr("x1", 0).attr("x2", 0)
+                        .attr("y1", 0).attr("y2", height - y);
+                    focus.select(".focus-line-y")
+                        .attr("x1", 0).attr("x2", -x)
+                        .attr("y1", 0).attr("y2", 0);
+                    
+                    // Calculate tooltip position relative to container
+                    const containerRect = document.getElementById('river-chart-container').getBoundingClientRect();
+                    const svgRect = svg.node().getBoundingClientRect();
+                    
+                    const tooltipX = (svgRect.left - containerRect.left) + margin.left + x;
+                    const tooltipY = (svgRect.top - containerRect.top) + margin.top + y;
+                    
+                    // Update tooltip
                     tooltip.html(`
-                        <strong>${d3.timeFormat("%b %d, %Y")(d.date)}</strong><br/>
-                        Price: <span style="color: #D4AF37; font-weight: 700;">$${d.close.toFixed(2)}</span><br/>
-                        Volatility: ${d.volatility.toFixed(1)}
+                        <div style="font-weight: 700; margin-bottom: 6px; font-size: 14px; color: #d4af37;">
+                            ${d3.timeFormat("%B %d, %Y")(d.date)}
+                        </div>
+                        <div style="margin-bottom: 4px;">
+                            <span style="color: #b8a890;">Price:</span> <span style="color: #f4e8d0; font-weight: 600;">$${d.close.toFixed(2)}</span>
+                        </div>
+                        <div>
+                            <span style="color: #b8a890;">Volatility:</span> <span style="color: #f4e8d0; font-weight: 600;">${d.volatility.toFixed(1)}</span>
+                        </div>
                     `)
-                        .style("left", (event.pageX + 15) + "px")
-                        .style("top", (event.pageY - 35) + "px");
+                        .style("left", (tooltipX + 20) + "px")
+                        .style("top", (tooltipY - 70) + "px")
+                        .style("opacity", 1);
                 }
-            })
-            .on("mouseout", function() {
-                tooltip.transition().duration(200).style("opacity", 0);
             });
         
     }).catch(error => {
         console.error("Error loading data:", error);
         d3.select("#river-chart-container")
+            .html("")
             .append("div")
             .style("text-align", "center")
             .style("padding", "100px")
-            .style("color", "#666")
-            .html(`<div style="font-size: 1.2rem;">Unable to load data</div>
-                   <div style="margin-top: 10px;">${error.message}</div>`);
+            .style("color", "#5c4a3a")
+            .style("font-family", "'Merriweather', serif")
+            .html(`<div style="font-size: 1.3rem; font-weight: 700; margin-bottom: 15px;">Unable to load historical data</div>
+                   <div style="font-size: 1rem; opacity: 0.7;">${error.message}</div>`);
     });
     
 })();

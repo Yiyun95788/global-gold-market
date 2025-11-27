@@ -1,49 +1,96 @@
-// Page 5: Balance Text Only
+// Page 5: Balance Text
 (function() {
     const container = d3.select("#balance-text-content");
+    container.html('');
     
-    const pageContainer = container.append("div")
-        .style("max-width", "900px")
-        .style("margin", "0 auto")
-        .style("padding", "80px 40px")
-        .style("height", "100vh")
+    const article = container.append("div")
+        .style("min-height", "100vh")
+        .style("background", "rgba(244, 232, 208, 0.75)")
+        .style("padding", "80px 0")
         .style("display", "flex")
         .style("flex-direction", "column")
         .style("justify-content", "center");
     
-    pageContainer.append("h2")
-        .style("font-size", "3rem")
-        .style("color", "var(--gold-primary)")
-        .style("margin-bottom", "20px")
-        .style("font-weight", "700")
-        .html("The Balance of <span class='gold-accent'>Power</span>");
+    const innerContent = article.append("div")
+        .style("max-width", "1000px")
+        .style("margin", "0 auto")
+        .style("padding", "0 80px");
     
-    pageContainer.append("div")
-        .attr("class", "gold-divider");
+    // Headline
+    innerContent.append("h2")
+        .attr("class", "article-headline scroll-reveal")
+        .style("border-top", "2px solid #2c2416")
+        .style("border-bottom", "2px solid #2c2416")
+        .style("padding", "20px 0")
+        .style("margin", "0 0 20px 0")
+        .text("THE BALANCE OF POWER");
     
-    pageContainer.append("p")
-        .style("font-size", "1.3rem")
-        .style("color", "var(--navy-light)")
+    // Subheadline
+    innerContent.append("div")
+        .attr("class", "article-subheadline scroll-reveal")
+        .text("G7 versus BRICS: A Tale of Two Alliances");
+    
+    // Dateline
+    innerContent.append("div")
+        .attr("class", "dateline scroll-reveal")
         .style("margin-bottom", "30px")
-        .style("font-weight", "300")
-        .text("Who holds the gold tells the real story");
+        .text("GEOPOLITICAL ANALYSIS");
     
-    pageContainer.append("p")
-        .style("font-size", "1.1rem")
+    // Ornamental divider
+    innerContent.append("div")
+        .attr("class", "ornamental-divider");
+    
+    // Two-column text section
+    const textColumns = innerContent.append("div")
+        .attr("class", "text-section-columns scroll-reveal")
+        .style("column-count", "2")
+        .style("column-gap", "50px")
+        .style("column-rule", "1px solid #d4c4a8")
+        .style("margin", "40px 0");
+    
+    textColumns.append("p")
+        .style("font-family", "'Merriweather', serif")
+        .style("font-size", "1.05rem")
         .style("line-height", "1.8")
-        .style("color", "var(--navy-light)")
-        .style("margin-bottom", "25px")
-        .html("The G7 represents leading Western industrialized nations anchored around the US dollar. BRICS emerged in 2009 as a coalition of major emerging economies seeking greater autonomy.");
+        .style("text-align", "justify")
+        .style("margin-bottom", "20px")
+        .html("<span style='float: left; font-size: 4rem; line-height: 0.8; font-weight: 700; margin: 5px 10px 0 0; font-family: Playfair Display, serif; color: #8b7355;'>T</span>he Group of Seven represents the leading Western industrialized nations, economies anchored around the United States dollar and the post-war financial architecture established at Bretton Woods. For decades, these nations held the majority of the world's gold reserves.");
     
-    pageContainer.append("div")
-        .attr("class", "highlight-box")
-        .style("margin", "30px 0")
-        .html("<strong>The shift is real.</strong> BRICS nations have become heavy net buyers of gold, while many G7 members have been net sellers. This strategic repositioning signals de-dollarization trends.");
-    
-    pageContainer.append("p")
-        .style("font-size", "1.1rem")
+    textColumns.append("p")
+        .style("font-family", "'Merriweather', serif")
+        .style("font-size", "1.05rem")
         .style("line-height", "1.8")
-        .style("color", "var(--navy-light)")
-        .text("Use the interactive scale on the next page to compare gold reserves across time. Drag countries onto either side to explore different groupings.");
+        .style("text-align", "justify")
+        .style("margin-bottom", "20px")
+        .html("In contrast, BRICS emerged in 2009 as a coalition of major emerging economies—Brazil, Russia, India, China, and South Africa—seeking greater autonomy from Western-dominated financial institutions. Recently expanded to include Egypt, Ethiopia, Iran, and the United Arab Emirates, this bloc represents a direct challenge to the established order.");
     
+    textColumns.append("p")
+        .style("font-family", "'Merriweather', serif")
+        .style("font-size", "1.05rem")
+        .style("line-height", "1.8")
+        .style("text-align", "justify")
+        .html("The shift in gold holdings between these two blocs tells a revealing story. While G7 nations have been net sellers of gold reserves, BRICS countries have become aggressive buyers, systematically accumulating physical gold as a hedge against dollar dominance.");
+    
+    // Pull quote
+    const pullQuote = innerContent.append("div")
+        .attr("class", "pull-quote scroll-reveal")
+        .style("max-width", "700px")
+        .style("margin", "40px auto");
+    
+    pullQuote.append("p")
+        .style("margin", "0")
+        .text("This strategic repositioning signals de-dollarization trends and a fundamental reordering of global economic power.");
+    
+    // Instruction text
+    innerContent.append("p")
+        .attr("class", "scroll-reveal")
+        .style("text-align", "center")
+        .style("font-family", "'EB Garamond', serif")
+        .style("font-size", "1.1rem")
+        .style("line-height", "1.6")
+        .style("margin", "50px auto 0")
+        .style("max-width", "700px")
+        .style("color", "#5c4a3a")
+        .style("font-style", "italic")
+        .html("Use the interactive scale ahead to compare gold reserves across time periods. Drag countries onto either side to explore different geopolitical alignments.");
 })();
