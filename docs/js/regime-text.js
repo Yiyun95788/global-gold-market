@@ -12,7 +12,7 @@
         .style("justify-content", "center");
     
     const innerContent = article.append("div")
-        .style("max-width", "1000px")
+        .style("max-width", "1600px")
         .style("margin", "0 auto")
         .style("padding", "0 80px");
     

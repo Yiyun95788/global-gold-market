@@ -12,7 +12,7 @@
         .style("justify-content", "center");
     
     const innerContent = article.append("div")
-        .style("max-width", "1000px")
+        .style("max-width", "1600px")
         .style("margin", "0 auto")
         .style("padding", "0 80px");
     
@@ -54,7 +54,7 @@
         .style("line-height", "1.8")
         .style("text-align", "justify")
         .style("margin-bottom", "20px")
-        .html("<span style='float: left; font-size: 4rem; line-height: 0.8; font-weight: 700; margin: 5px 10px 0 0; font-family: Playfair Display, serif; color: #8b7355;'>T</span>he Group of Seven represents the leading Western industrialized nations, economies anchored around the United States dollar and the post-war financial architecture established at Bretton Woods. For decades, these nations held the majority of the world's gold reserves.");
+        .html("<span style='float: left; font-size: 4rem; line-height: 0.8; font-weight: 700; margin: 5px 10px 0 0; font-family: Playfair Display, serif; color: #8b7355;'>T</span>he Group of Seven (G7) represents the leading Western industrialized nations, economies anchored around the United States dollar and the post-war financial architecture established at Bretton Woods. For decades, these nations held the majority of the world's gold reserves.");
     
     textColumns.append("p")
         .style("font-family", "'Merriweather', serif")
@@ -62,8 +62,16 @@
         .style("line-height", "1.8")
         .style("text-align", "justify")
         .style("margin-bottom", "20px")
-        .html("In contrast, BRICS emerged in 2009 as a coalition of major emerging economies—Brazil, Russia, India, China, and South Africa—seeking greater autonomy from Western-dominated financial institutions. Recently expanded to include Egypt, Ethiopia, Iran, and the United Arab Emirates, this bloc represents a direct challenge to the established order.");
+        .html("In contrast, BRICS emerged in 2009 as a coalition of major emerging economies: Brazil, Russia, India, China, and South Africa, seeking greater autonomy from Western-dominated financial institutions. Recently expanded to include Egypt, Ethiopia, Iran, and the United Arab Emirates, this bloc represents a direct challenge to the established order. ");
     
+    textColumns.append("p")
+        .style("font-family", "'Merriweather', serif")
+        .style("font-size", "1.05rem")
+        .style("line-height", "1.8")
+        .style("text-align", "justify")
+        .style("margin-bottom", "20px")
+        .html("Nixon’s 1971 end to dollar–gold convertibility collapsed Bretton Woods and created today’s fiat-dollar system. Since then, G7 gold reserves have trended down while emerging economies have accumulated more. ");
+
     textColumns.append("p")
         .style("font-family", "'Merriweather', serif")
         .style("font-size", "1.05rem")
@@ -79,7 +87,7 @@
     
     pullQuote.append("p")
         .style("margin", "0")
-        .text("This strategic repositioning signals de-dollarization trends and a fundamental reordering of global economic power.");
+        .text("'Gold has been flowing from West to East, thereby boosting gold holdings of the East at the expense of the West, while increasing the importance of Asian gold markets.' - In Gold We Trust report (Incrementum AG)");
     
     // Instruction text
     innerContent.append("p")

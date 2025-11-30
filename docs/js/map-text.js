@@ -12,7 +12,7 @@
         .style("justify-content", "center");
     
     const innerContent = article.append("div")
-        .style("max-width", "1000px")
+        .style("max-width", "1600px")
         .style("margin", "0 auto")
         .style("padding", "0 80px");
     
@@ -54,7 +54,7 @@
         .style("line-height", "1.8")
         .style("text-align", "justify")
         .style("margin-bottom", "20px")
-        .html("<span style='float: left; font-size: 4rem; line-height: 0.8; font-weight: 700; margin: 5px 10px 0 0; font-family: Playfair Display, serif; color: #8b7355;'>G</span>old reserves and production patterns reveal the underlying geopolitical strategies of nations. While historically dominated by G7 countries and Switzerland, the geography of gold has shifted dramatically since the turn of the millennium.");
+        .html("<span style='float: left; font-size: 4rem; line-height: 0.8; font-weight: 700; margin: 5px 10px 0 0; font-family: Playfair Display, serif; color: #8b7355;'>G</span>old reserves and production patterns reveal the underlying geopolitical strategies of nations. Official gold reserves remain heavily concentrated in the post-war core. The U.S. alone holds about 8,100 tonnes of gold, while Germany, Italy, and France together hold roughly another 8,200 tonnes, leaving the U.S. and Europe with well over half of reported global central-bank gold reserves. These stocks are largely “legacy hoards” accumulated under and shortly after Bretton Woods, with Western central banks mostly holding steady rather than aggressively adding to them in recent decades.");
     
     textColumns.append("p")
         .style("font-family", "'Merriweather', serif")
@@ -62,14 +62,14 @@
         .style("line-height", "1.8")
         .style("text-align", "justify")
         .style("margin-bottom", "20px")
-        .html("China, Russia, and India have steadily climbed the ranks of top gold holders. These emerging powers view gold not merely as a financial asset but as a strategic resource essential to national sovereignty and monetary independence.");
+        .html("By contrast, emerging markets have become the main source of new official demand. BRICS members and other emerging economies now hold roughly one-fifth of global official gold reserves, and their central banks have been responsible for the bulk of net gold purchases since the early 2000s. Record central-bank buying of over 1,000 tonnes per year in 2022 and 2023 was driven primarily by countries such as China, Russia, Turkey, India, and Kazakhstan, which explicitly cite diversification away from the dollar and greater monetary resilience as key motives.");
     
     textColumns.append("p")
         .style("font-family", "'Merriweather', serif")
         .style("font-size", "1.05rem")
         .style("line-height", "1.8")
         .style("text-align", "justify")
-        .html("Around 2015, a crucial threshold was crossed: emerging economies collectively surpassed the traditional top holders in total gold reserves. This marked a fundamental shift in global reserve behavior and signaled the beginning of a new era in monetary geopolitics.");
+        .html("The intersection with production underscores how the monetary map is shifting. Europe stores a disproportionate share of global official reserves but contributes relatively little to current mine output, whereas China and Russia now rank among both the largest producers and the fastest-growing official holders of gold. At the same time, many African and Latin American states are significant gold exporters with comparatively small official reserves, effectively supplying metal into a system where fiscal and monetary power is still anchored in Western vaults but increasingly reinforced by emerging-market accumulation.");
     
     // Pull quote
     const pullQuote = innerContent.append("div")
@@ -79,7 +79,7 @@
     
     pullQuote.append("p")
         .style("margin", "0")
-        .text("Geography is destiny in the gold market. Control over reserves and production defines economic sovereignty.");
+        .text("'The East is not only stocking up on gold and mining gold itself on a large scale. China and Russia have ranked among the top 3 gold producing nations for years.' — Ronnie Stoeferle, “5 Signs that Gold Will increasingly Flow to the East” (2023)");
     
     // Instruction text
     innerContent.append("p")

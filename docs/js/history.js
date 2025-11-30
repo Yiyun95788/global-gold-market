@@ -81,7 +81,7 @@
     pullQuote.append("p")
         .style("margin", "0")
         .style("font-size", "1.4rem")
-        .text("Gold's price history is a chronicle of monetary upheaval and the eternal flight to safety.");
+        .text("'Crossing the $3,000 mark underscores gold’s role as a barometer of fear and economic instability.' - Financial Express, “Why is gold surging? 3 big reasons behind the surge to $3,000” (March 14, 2025) ");
     
     // Instruction text
     innerContent.append("p")
@@ -242,12 +242,30 @@
             .style("opacity", 0.9);
         
         const events = [
-            {year: 2008, month: 9, label: '2008 Crisis'},
-            {year: 2011, month: 9, label: 'EU Debt'},
-            {year: 2020, month: 3, label: 'COVID-19'},
-            {year: 2022, month: 2, label: 'Ukraine'},
-            {year: 2024, month: 10, label: '2024 Peak'}
+            {year: 2008, month: 9, label: '2008 Crisis', desc: 'The Global Financial Crisis triggered a flight to safety, boosting gold prices.'},
+            {year: 2011, month: 9, label: 'EU Debt', desc: 'Gold’s 2011 peak was driven by Eurozone collapse fears; its bear market began the moment central banks stabilized the system and the dollar reversed upward.'},
+            {year: 2015, month: 12, label: 'Fed Hikes', desc: 'The Federal Reserve raised rates for the first time in nearly a decade, marking the end of gold’s multi-year bear market and triggering a reversal'},
+            {year: 2020, month: 3, label: 'COVID-19', desc: 'The pandemic caused economic uncertainty and massive stimulus, rallying gold.'},
+            {year: 2022, month: 2, label: 'Ukraine', desc: 'Russia\'s invasion of Ukraine sparked geopolitical tension, supporting gold prices.'},
+            {year: 2023, month: 10, label: 'ME Conflict', desc: 'Conflict in the Middle East renewed geopolitical risks and demand for safe-haven assets.'}
         ];
+
+        // Tooltip for events
+        const eventTooltip = d3.select("body").selectAll(".history-event-tooltip").data([0])
+            .join("div")
+            .attr("class", "history-event-tooltip")
+            .style("position", "fixed")
+            .style("background", "rgba(44, 36, 22, 0.95)")
+            .style("color", "#f4e8d0")
+            .style("padding", "12px")
+            .style("border-radius", "6px")
+            .style("font-family", "'Merriweather', serif")
+            .style("font-size", "13px")
+            .style("max-width", "250px")
+            .style("pointer-events", "none")
+            .style("opacity", 0)
+            .style("z-index", 1000)
+            .style("box-shadow", "0 4px 12px rgba(0,0,0,0.2)");
         
         events.forEach(event => {
             const eventDate = new Date(event.year, event.month - 1);
@@ -260,7 +278,27 @@
             if (dataPoint) {
                 const y = yScale(dataPoint.close);
                 
-                g.append("line")
+                // Create a group for the event to handle interactions
+                const eventG = g.append("g")
+                    .attr("class", "event-marker")
+                    .style("cursor", "pointer")
+                    .on("mouseover", function(e) {
+                        d3.select(this).select("rect").style("stroke-width", 2.5).style("fill", "#fff");
+                        eventTooltip.transition().duration(200).style("opacity", 1);
+                        eventTooltip.html(`<strong>${event.label}</strong><br/><span style="font-size:12px; opacity:0.9">${event.desc}</span>`)
+                            .style("left", (e.clientX + 15) + "px")
+                            .style("top", (e.clientY + 15) + "px");
+                    })
+                    .on("mousemove", function(e) {
+                        eventTooltip.style("left", (e.clientX + 15) + "px")
+                               .style("top", (e.clientY + 15) + "px");
+                    })
+                    .on("mouseout", function() {
+                        d3.select(this).select("rect").style("stroke-width", 1.5).style("fill", "#f4e8d0");
+                        eventTooltip.transition().duration(500).style("opacity", 0);
+                    });
+
+                eventG.append("line")
                     .attr("x1", x).attr("x2", x)
                     .attr("y1", y).attr("y2", -40)
                     .style("stroke", "#5c4a3a")
@@ -268,7 +306,7 @@
                     .style("stroke-dasharray", "5,5")
                     .style("opacity", 0.6);
                 
-                g.append("rect")
+                eventG.append("rect")
                     .attr("x", x - 35).attr("y", -58)
                     .attr("width", 70).attr("height", 18)
                     .attr("rx", 4)
@@ -277,13 +315,14 @@
                     .style("stroke-width", 1.5)
                     .style("opacity", 0.95);
                 
-                g.append("text")
+                eventG.append("text")
                     .attr("x", x).attr("y", -44)
                     .attr("text-anchor", "middle")
                     .style("font-size", "11px")
                     .style("font-weight", "700")
                     .style("font-family", "'Merriweather', serif")
                     .style("fill", "#2c2416")
+                    .style("pointer-events", "none") // Let the group handle mouse events
                     .text(event.label);
             }
         });
