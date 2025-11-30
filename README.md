@@ -6,8 +6,12 @@ This project is the final project for the course CSC316: Data Visualization: Fou
 The Global Gold Market Project explores the drivers of the current gold market boom by creating various insightful visualizations. The project integrated multiple datasets from reliable sources, and together producing a compelling data story that not only showcases gold’s current record highs, but also explains why this moment is unusual in historical context.\
 Steps and decisions of this project are recorded in our [process book](https://docs.google.com/document/d/1_T0myRcBCHLo46875zb36hIC_gwhNh9MgXAIH36EucY/edit?usp=sharing).
 
-### Live Demo
-[Gold: The Great Power Shift](https://yiyun95788.github.io/global-gold-market/docs/index.html#balance)
+### Project Website & Demo Video
+
+- **Deployed Project Website**:\
+  [The Golden Chronicle - Special Edition](https://yiyun95788.github.io/global-gold-market/docs/index.html)
+
+- The demo video can be accessed [here](https://www.youtube.com/watch?v=oL89nnXMdaA).
 
 ## Submissions
 The repository contains:
@@ -27,12 +31,28 @@ The html file that is used to deploy at root on GitHub.
 - **docs/data/**\
   Contains datasets that used to contribute to the visualizations in this project.
 
+- **docs/images/**\
+  Contains images used in this project.
+
 - **docs/js/**\
   Contains JavaScript files.
   - Files: `home.js`, `paradox.js`, `history.js`, `transition.js`, `balance-text.js`, `vis2.js`, `balance.js`, `map-text.js`, `vis3.js`, `map.js`, `regime-text.js`, `regime.js`, `conclusion.js`
 
+ - **docs/json/**\
+   Contains all the JSON data.
+
 - **README.md**\
   The file that contains the project description and relevant information.
+
+## Code Structure
+
+### Our code
+- All files in `docs/css/` and `docs/js/`, `docs/index.html`, and the `index.html` at root were written by the team.
+
+### Libraries
+- D3.js: Main data visualization library used throughout for creating charts, maps, and interactive visualizations
+- fullPage.js: Used for creating the full-page scrolling effects
+- TopoJSON: Used for working with TopoJSON geographic data in the world map
 
 ## Data Sources & Citations
 ### Market News & Academic Research
